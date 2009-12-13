@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flash-mastery>
+	<headergallery>
+		<config>
+			<param name="pause" value="6" />
+			<param name="width" value="700" />
+			<param name="height" value="240" />
+			<param name="bitmapSmoothing" value="false" />
+		</config>
+		<effects>
+			<effect id="0" type="SmoothedMask" speed="1">
+				<param name="direction" value="B" />
+			</effect>
+			<effect id="1" type="TiledMask" speed="1">
+				<param name="numX" value="7" />
+				<param name="numY" value="4" />
+				<param name="direction" value="R" />
+			</effect>
+			<effect id="2" type="StripedMask" speed="1">
+				<param name="numStripes" value="7" />
+				<param name="direction" value="T" />
+			</effect>
+			<effect id="3" type="ColorSreen" speed="1">
+				<param name="color" value="0xFFFFFF" />
+			</effect>
+			<effect id="4" type="AlphaSreen" speed="1" />
+		</effects>
+		<images>
+			<img src="img/header1.jpg" alt="Tool-Tipp" id="effectID" />
+			<img src="img/header2.jpg" alt="Tool-Tipp" id="effectID" />
+			<img src="img/header3.jpg" alt="Tool-Tipp" id="effectID" />
+			<img src="img/header4.jpg" alt="Tool-Tipp" id="effectID" />
+			<img src="img/header5.jpg" alt="Tool-Tipp" id="effectID" />
+		</images>
+	</headergallery>
+</flash-mastery>
