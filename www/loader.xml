@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<flash-mastery>
+	<loader-resources>
+		<resource id="CONTENT_XML" url="config.xml" type="XML"/>
+		<resource id="APPLICATION" url="FMPaper3DApplication.swf" type="SWF"/>
+		<resource id="material_front" url="img/material.jpg" type="BITMAP"/>
+		<resource id="material_back" url="img/materialBack.jpg" type="BITMAP"/>
+	</loader-resources>
+</flash-mastery>
