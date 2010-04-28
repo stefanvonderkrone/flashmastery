@@ -29,7 +29,7 @@ package com.flashmastery.as3.paper3d.components {
 			_plane.x = _plane.width / 2;
 			addChild( _plane );
 			_modifierStack = new ModifierStack( new LibraryAway3d( ), _plane );
-			_bendMod = new Bend( 0, 0, -Math.PI / 2 );
+			_bendMod = new Bend( 0, 0.1, -Math.PI / 2 );
 			_baseBendMod = new Bend( 0.1, 0.8, Math.PI / 2 );
 			_baseBendAngle = _baseBendMod.angle;			_baseBendOffset = _baseBendMod.offset;			_baseBendForce = _baseBendMod.force;
 			_bendMod.constraint = ModConstant.LEFT;
