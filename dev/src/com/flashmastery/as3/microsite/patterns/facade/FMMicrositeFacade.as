@@ -32,11 +32,11 @@ package com.flashmastery.as3.microsite.patterns.facade {
 				key : String,
 				startupCommand : Class,
 				shutDownCommand : Class,
-				mainMediatorClass : Class = FMMainMediator,
-				configProxyClass : Class = FMConfigProxy,
-				historyProxyClass : Class = FMHistoryProxy ) : IMicrositeFacade {
+				mainMediatorClass : Class = null,
+				configProxyClass : Class = null,
+				historyProxyClass : Class = null ) : IMicrositeFacade {
 			if ( instanceMap[ key ] == null )
-				instanceMap[ key ] = new FMMicrositeFacade( key, mainMediatorClass, configProxyClass );
+				instanceMap[ key ] = new FMMicrositeFacade( key, startupCommand, shutDownCommand, mainMediatorClass, configProxyClass, historyProxyClass );
 			return instanceMap[ key ];
 		}
 
@@ -44,15 +44,15 @@ package com.flashmastery.as3.microsite.patterns.facade {
 				key : String,
 				startupCommand : Class,
 				shutDownCommand : Class,
-				mainMediatorClass : Class = FMMainMediator,
-				configProxyClass : Class = FMConfigProxy,
-				historyProxyClass : Class = FMHistoryProxy ) {
-			super( key );
+				mainMediatorClass : Class = null,
+				configProxyClass : Class = null,
+				historyProxyClass : Class = null ) {
 			_startupCommand = startupCommand;
 			_shutDownCommand = shutDownCommand;
-			_mainMediatorClass = mainMediatorClass;
-			_configProxyClass = configProxyClass;
-			_historyProxyClass = historyProxyClass;
+			_mainMediatorClass = mainMediatorClass == null ? FMMainMediator : mainMediatorClass;
+			_configProxyClass = configProxyClass == null ? FMConfigProxy : configProxyClass;
+			_historyProxyClass = historyProxyClass == null ? FMHistoryProxy : historyProxyClass;
+			super( key );
 			trace( "<<<---------->>>" );
 			trace( FMMicrositeFramework.getVersion() );
 			trace( "Based on PureMVC Multicore (http://puremvc.org/)" );

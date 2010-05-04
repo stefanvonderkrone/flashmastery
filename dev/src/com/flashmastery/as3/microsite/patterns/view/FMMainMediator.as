@@ -1,9 +1,8 @@
 package com.flashmastery.as3.microsite.patterns.view {
-	import gs.TweenLite;
-
 	import com.flashmastery.as3.microsite.patterns.controller.notifications.FMNotifications;
 	import com.flashmastery.as3.microsite.patterns.interfaces.IContentMediator;
 	import com.flashmastery.as3.microsite.patterns.interfaces.IHistoryProxy;
+	import com.greensock.TweenLite;
 
 	import org.puremvc.as3.multicore.interfaces.INotification;
 
@@ -17,12 +16,12 @@ package com.flashmastery.as3.microsite.patterns.view {
 		
 		protected var _currentContentMediator : IContentMediator;
 		
-		protected var _sectionsList : Dictionary;
+		protected var _sectionsClassesList : Dictionary;
 
 		public function FMMainMediator(viewComponent : Sprite, mediatorName : String = "", view : Sprite = null) {
 			super( mediatorName, viewComponent, view );
 			addNotification( FMNotifications.CHANGE_SECTION, changeSectionHandler );
-			_sectionsList = new Dictionary();
+			_sectionsClassesList = new Dictionary();
 			hideView( 0, 0 );
 		}
 
@@ -39,15 +38,15 @@ package com.flashmastery.as3.microsite.patterns.view {
 //		}
 		
 		protected function addSection( section : String, mediatorClass : Class ) : void {
-			_sectionsList[ section ] = mediatorClass;
+			_sectionsClassesList[ section ] = mediatorClass;
 		}
 
 		protected function removeSection( section : String ) : void {
-			delete _sectionsList[ section ];
+			delete _sectionsClassesList[ section ];
 		}
 		
 		protected function getSectionClass( section : String ) : Class {
-			return _sectionsList[ section ] as Class;
+			return _sectionsClassesList[ section ] as Class;
 		}
 
 		protected function changeSectionHandler( note : INotification ) : void {
@@ -55,12 +54,13 @@ package com.flashmastery.as3.microsite.patterns.view {
 		}
 		
 		override protected function changeSection(section : String) : void {
-			if ( currentSection != section ) {
+			var newContentMediator : IContentMediator = getContentMediatorBySection( section );
+			if ( newContentMediator && currentSection != section ) {
 				if ( _currentContentMediator != null ) {
 					var delay : Number = _currentContentMediator.hideView();
 					TweenLite.delayedCall(delay, facade.removeMediator, [ _currentContentMediator.getMediatorName() ] );
 				}
-				_currentContentMediator = getContentMediatorBySection( section );
+				_currentContentMediator = newContentMediator;
 				if ( _currentContentMediator != null ) {
 					historyProxy.setNext( section );
 					_currentContentMediator.historyProxyName = historyProxyName;
