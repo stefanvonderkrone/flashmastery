@@ -12,5 +12,11 @@ package com.flashmastery.as3.webservice.interfaces {
 		
 		function sendCall() : void;
 		
+		function get result() : String;
+		
+		function get resultXML() : XML;
+		
+		function get resultObject() : Object;
+		
 	}
 }

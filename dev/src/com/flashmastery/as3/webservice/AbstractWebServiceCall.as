@@ -9,6 +9,9 @@ package com.flashmastery.as3.webservice {
 	public class AbstractWebServiceCall extends EventDispatcher implements IWebServiceCall {
 		
 		protected var _type : String;
+		protected var _result : String;
+		protected var _resultXML : XML;
+		protected var _resultObject : Object;
 
 		public function AbstractWebServiceCall( type : String ) {
 			super( null );
@@ -23,6 +26,18 @@ package com.flashmastery.as3.webservice {
 		}
 		
 		public function dispose() : void {
+		}
+		
+		public function get result() : String {
+			return _result;
+		}
+		
+		public function get resultXML() : XML {
+			return _resultXML;
+		}
+		
+		public function get resultObject() : Object {
+			return _resultObject;
 		}
 	}
 }

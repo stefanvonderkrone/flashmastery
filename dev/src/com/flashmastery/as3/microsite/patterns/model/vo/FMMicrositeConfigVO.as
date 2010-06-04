@@ -1,6 +1,7 @@
 package com.flashmastery.as3.microsite.patterns.model.vo {
 	import com.flashmastery.as3.microsite.interfaces.IStartupConfiguration;
 
+	import flash.display.Sprite;
 	import flash.utils.Dictionary;
 
 	/**
@@ -13,14 +14,18 @@ package com.flashmastery.as3.microsite.patterns.model.vo {
 		protected var _flashVars : Dictionary;
 		protected var _defaultStartPage : String = "";
 		protected var _xml : XML;
+		protected var _additionalData : *;
+		protected var _view : Sprite;
 
 		public function FMMicrositeConfigVO( startupConfig : IStartupConfiguration ) {
 			_mediatorDataProvider = new Dictionary( );
 			_startPageConstants = new Dictionary( );
 			_flashVars = getDictionary( startupConfig.flashVars );
 			_xml = startupConfig.xml;
+			_additionalData = startupConfig.additionalData;
+			_view = startupConfig.view;
 		}
-		
+
 		protected function getDictionary(object : Object) : Dictionary {
 			var map : Dictionary = new Dictionary();
 			for ( var param : String in object ) {
@@ -51,6 +56,10 @@ package com.flashmastery.as3.microsite.patterns.model.vo {
 		
 		public function get flashVars() : Dictionary {
 			return _flashVars;
+		}
+		
+		public function get additionalData() : * {
+			return _additionalData;
 		}
 	}
 }
