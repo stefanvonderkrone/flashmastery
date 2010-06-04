@@ -16,14 +16,13 @@ package com.flashmastery.as3.webservice {
 		protected var _urlLoader : URLLoader;
 		protected var _urlVars : URLVariables;
 		protected var _url : String;
-		protected var _result : String;
-		protected var _resultXML : String;
-		protected var _resultObject : String;
-		protected var _requestMethod : String = URLRequestMethod.POST;
+		protected var _requestMethod : String;
 
-		public function FMWebServiceURLCall(type : String, url : String = "") {
+		public function FMWebServiceURLCall(type : String, url : String = "", requestMethod : String = URLRequestMethod.POST, urlVars : URLVariables = null ) {
 			super( type );
 			_url = url;
+			_requestMethod = requestMethod;
+			_urlVars = urlVars;
 		}
 
 		override public function sendCall() : void {
@@ -35,9 +34,9 @@ package com.flashmastery.as3.webservice {
 			request.method = _requestMethod;
 			if ( _urlVars ) request.data = _urlVars;
 			_urlLoader = new URLLoader();
-			_urlLoader.addEventListener( IOErrorEvent.IO_ERROR, errorHandler, false, 0, true );
-			_urlLoader.addEventListener( SecurityErrorEvent.SECURITY_ERROR, errorHandler, false, 0, true );
-			_urlLoader.addEventListener( Event.COMPLETE, completeHandler, false, 0, true );
+			_urlLoader.addEventListener( IOErrorEvent.IO_ERROR, errorHandler );
+			_urlLoader.addEventListener( SecurityErrorEvent.SECURITY_ERROR, errorHandler );
+			_urlLoader.addEventListener( Event.COMPLETE, completeHandler );
 			_urlLoader.load( request );
 		}
 
@@ -45,6 +44,7 @@ package com.flashmastery.as3.webservice {
 			_result = _urlLoader.data;
 			try {
 				_resultXML = new XML( _urlLoader.data );
+				_resultObject = parseResult( _result );
 			} catch ( e : Error ) {}
 			_urlLoader.removeEventListener( IOErrorEvent.IO_ERROR, errorHandler );
 			_urlLoader.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, errorHandler );
