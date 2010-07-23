@@ -1,6 +1,7 @@
 package com.flashmastery.as3.display {
 	import com.greensock.TweenLite;
 	import com.greensock.plugins.AutoAlphaPlugin;
+	import com.greensock.plugins.TintPlugin;
 	import com.greensock.plugins.TweenPlugin;
 
 	import org.openvideoplayer.events.OvpEvent;
@@ -29,6 +30,9 @@ package com.flashmastery.as3.display {
 		private var _thumbPlane : ExtendedSprite;
 		private var _video : Video;
 		
+		private var _bgColor : uint = 0;
+		private var _bgAlpha : Number = 1;
+		
 		private var _scaleMode : String;
 		private var _align : String;
 		
@@ -44,7 +48,7 @@ package com.flashmastery.as3.display {
 
 		public function VideoPlayer( width : int = 320, height : int = 240 ) {
 			super( );
-			TweenPlugin.activate( [ AutoAlphaPlugin ] );
+			TweenPlugin.activate( [ AutoAlphaPlugin, TintPlugin ] );
 			_blackPlane = getBlackPlane( width, height );
 			_videoMask = getBlackPlane( width, height );
 			_thumbMask = getBlackPlane( width, height );
@@ -373,6 +377,24 @@ package com.flashmastery.as3.display {
 		
 		public function get videoAspectRatio() : int {
 			return _videoAspectRatio;
+		}
+		
+		public function get bgColor() : uint {
+			return _bgColor;
+		}
+		
+		public function set bgColor(bgColor : uint) : void {
+			_bgColor = bgColor;
+			TweenLite.to( _blackPlane, 0, { tint: bgColor } );
+		}
+		
+		public function get bgAlpha() : Number {
+			return _bgAlpha;
+		}
+		
+		public function set bgAlpha(bgAlpha : Number) : void {
+			_bgAlpha = bgAlpha;
+			_blackPlane.alpha = bgAlpha;
 		}
 	}
 }

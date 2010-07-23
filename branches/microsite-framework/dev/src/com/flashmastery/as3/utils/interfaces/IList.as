@@ -40,7 +40,7 @@ package com.flashmastery.as3.utils.interfaces {
 		
 		function setElementAt(element : *, index : Number) : void;
 		
-		function get length() : Number;
+		function get length() : uint;
 		
 		function set length( length : uint ): void;
 		

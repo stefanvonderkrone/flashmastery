@@ -8,7 +8,7 @@ package com.flashmastery.as3.utils {
 
 		protected var _elementList : Array;
 
-		public function ElementContainer( elementList : Array ) {
+		public function ElementContainer( elementList : Array = null ) {
 			_elementList = elementList != null ? elementList : [];
 		}
 
