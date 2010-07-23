@@ -132,13 +132,15 @@ package com.flashmastery.as3.display {
 			switch( evt.type ) {
 				case Event.COMPLETE:
 						var thumb : DisplayObject = _thumbLoader.content;
-						_thumb = new BitmapData(thumb.width, thumb.height, true, 0);
-						_thumb.draw( thumb );
-						_thumbLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, thumbLoaderHandler );
-						_thumbLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, thumbLoaderHandler );
-						_thumbLoader.contentLoaderInfo.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, thumbLoaderHandler );
-						_thumbLoader.unload();
-						setThumbnail( _thumb );
+						if ( thumb ) {
+							_thumb = new BitmapData(thumb.width, thumb.height, true, 0);
+							_thumb.draw( thumb );
+							_thumbLoader.contentLoaderInfo.removeEventListener( Event.COMPLETE, thumbLoaderHandler );
+							_thumbLoader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, thumbLoaderHandler );
+							_thumbLoader.contentLoaderInfo.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, thumbLoaderHandler );
+							_thumbLoader.unload();
+							setThumbnail( _thumb );
+						}
 					break;
 				case IOErrorEvent.IO_ERROR:
 				case SecurityErrorEvent.SECURITY_ERROR:
