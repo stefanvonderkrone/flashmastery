@@ -361,7 +361,7 @@ package com.flashmastery.as3.display {
 		}
 
 		override public function set scaleY(value : Number) : void {
-			super.scaleY = _videoMask.scaleY = _thumbMask.scaleY = value;
+			_blackPlane.scaleY = _videoMask.scaleY = _thumbMask.scaleY = value;
 			invalidate();
 		}
 		
