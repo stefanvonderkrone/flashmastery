@@ -21,9 +21,13 @@ package com.flashmastery.as3.memory.allocator {
 		private var _firstEntry : FMAllocTableEntry;
 
 		public function FMAllocator() {
+			init();
+		}
+
+		protected function init() : void {
 			_allocTable = new Dictionary( );
 			_firstEntry = new FMAllocTableEntry( );
-			_firstEntry.init();
+			_firstEntry.init( );
 		}
 
 		public function alloc(allocableClass : Class) : * {
