@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
 		paddingBottom="10" paddingLeft="10" paddingRight="10"
-		paddingTop="10" enterFrame="enterframeHandler()">
+		paddingTop="10" enterFrame="enterframeHandler()"
+		initialize="onInit( event )">
 	<mx:Panel width="620" height="460" paddingBottom="10" paddingLeft="10"
 			paddingRight="10" paddingTop="10" title="FMMemoryTest"
 			layout="absolute">
-		<mx:Canvas paddingBottom="0" paddingLeft="0" paddingRight="0"
-			paddingTop="0" width="580" height="340" x="10" y="10"
+		<mx:Canvas width="580" height="340" x="10" y="10"
 			backgroundColor="0" id="_canvas">		
 		</mx:Canvas>
 		<mx:Button id="_alloc" label="allocInstance" y="360" x="10"
@@ -21,6 +21,7 @@
 	<mx:Script>
 		<![CDATA[
 		
+			import com.flashmastery.as3.memory.allocator.fp10.FMAllocatorFP10;
 			import com.flashmastery.as3.memory.alloc;
 			import com.flashmastery.as3.memory.allocator;
 			import com.flashmastery.as3.memory.release;
@@ -73,6 +74,10 @@
 			private function enterframeHandler() : void {
 				_memory.text = System.totalMemory.toString() + " Bytes";
 				_memoryMB.text = "( " + ( Math.round( System.totalMemory / 1024 / 1024 * 100 ) / 100 ).toString() + " MB )";
+			}
+			
+			private function onInit( event : Event ) : void {
+				allocator = FMAllocatorFP10.getInstance();
 			}
 			
 		]]>
