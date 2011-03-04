@@ -6,7 +6,7 @@ package com.flashmastery.as3.memory.interfaces {
 	public interface IAllocatable {
 		
 		function dealloc() : void;
-		function init( ... params ) : IAllocatable;
+		function init() : IAllocatable;
 		
 	}
 }
