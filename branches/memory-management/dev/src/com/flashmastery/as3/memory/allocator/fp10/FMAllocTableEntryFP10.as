@@ -19,7 +19,7 @@ package com.flashmastery.as3.memory.allocator.fp10 {
 			_allocated = null;
 		}
 		
-		public function init(...params : *) : IAllocatable {
+		public function init() : IAllocatable {
 			_released = new Vector.<*>( );
 			_allocated = new Vector.<*>( );
 			return this;

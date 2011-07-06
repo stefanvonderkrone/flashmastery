@@ -19,7 +19,7 @@ package com.flashmastery.as3.memory.allocator {
 			_allocated = null;
 		}
 
-		public function init(...params : *) : IAllocatable {
+		public function init() : IAllocatable {
 			_released = [];
 			_allocated = [];
 			return this;

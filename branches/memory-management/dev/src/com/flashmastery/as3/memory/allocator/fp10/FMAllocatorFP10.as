@@ -31,7 +31,7 @@ package com.flashmastery.as3.memory.allocator.fp10 {
 		}
 
 		public function alloc(allocableClass : Class) : * {
-			var q : String = getQualifiedClassName( allocableClass );
+			var q : String = getQualifiedClassName( allocableClass ).split( "::" ).join( "." );
 			var entry : FMAllocTableEntryFP10 = _allocTable[ q ];
 			var instance : *;
 			if ( entry ) {
@@ -54,7 +54,7 @@ package com.flashmastery.as3.memory.allocator.fp10 {
 		}
 		
 		public function release(instance : *) : void {
-			var q : String = getQualifiedClassName( instance );
+			var q : String = getQualifiedClassName( instance ).split( "::" ).join( "." );
 			var entry : FMAllocTableEntryFP10 = _allocTable[ q ];
 			if ( entry ) {
 				for ( var i : uint = 0; i < entry.allocated.length; i++ ) {
@@ -86,7 +86,7 @@ package com.flashmastery.as3.memory.allocator.fp10 {
 			if ( classes ) {
 				for ( var i : uint = 0; i < classes.length; i++ ) {
 					if ( classes[ i ] != FMAllocTableEntryFP10 ) {
-						q = getQualifiedClassName( classes[ i ] );
+						q = getQualifiedClassName( classes[ i ] ).split( "::" ).join( "." );
 						entry = _allocTable[ q ];
 						delete _allocTable[ q ];
 						if ( entry ) releaseEntry( entry );
