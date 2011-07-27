@@ -26,7 +26,8 @@ package com.flashmastery.as3.blitting.core {
 		protected var _y : int = 0;
 		protected var _registrationPointX : int = 0;
 		protected var _registrationPointY : int = 0;
-		protected var _mouseEnabled : Boolean = false;
+		protected var _mouseEnabled : Boolean = true;
+		protected var _useHandCursor : Boolean = false;
 		protected var _shapeColor : uint;
 		protected var _rect : Rectangle;
 
@@ -37,7 +38,7 @@ package com.flashmastery.as3.blitting.core {
 
 		protected function contruct() : void {
 			_name = "spriteSheet" + spriteIndex.toString();
-			_shapeColor = shapeColorMultiplier * spriteIndex;
+			_shapeColor = shapeColorMultiplier * ( spriteIndex + 1 );
 			_rect = new Rectangle();
 			_root = this;
 			spriteIndex++;
@@ -52,24 +53,24 @@ package com.flashmastery.as3.blitting.core {
 		}
 		
 		public function getRect() : Rectangle {
-			return _rect;
+			return _rect.clone();
 		}
 		
 		public function getRectByCoords( targetCoordinateSpace : SpriteSheet ) : Rectangle {
 			// TODO targetCoordinateSpace is not in the iteration between stage/root and this
-			// TODO this contains targetCoordinateSpace 
-			if ( targetCoordinateSpace == _parent ) return getRect().clone();
+			if ( targetCoordinateSpace == _parent ) return getRect();
 			else if ( targetCoordinateSpace && _parent ) {
 				var container : SpriteSheetContainer = _parent;
-				var rect : Rectangle = _rect.clone();
+				var rect : Rectangle = getRect();
 				for ( ; container != null; ) {
 					if ( container == _stage ) return rect;
 					rect.x += container.x - container.registrationPointX;
 					rect.y += container.y - container.registrationPointY;
 					container = container.parent;
 				}
+				return rect;
 			}
-			return getRect().clone();
+			return getRect();
 		}
 		
 		public function globalToLocal( point : Point ) : Point {
@@ -115,9 +116,10 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set bitmapData( bitmapData : BitmapData ) : void {
+			if ( _bitmapData == bitmapData ) return;
 			_bitmapData = bitmapData;
-			_rect.width = _bitmapData.width;
-			_rect.height = _bitmapData.height;
+			_rect.width = _bitmapData ? _bitmapData.width : 0;
+			_rect.height = _bitmapData ? _bitmapData.height : 0;
 		}
 
 		public function get name() : String {
@@ -222,6 +224,14 @@ package com.flashmastery.as3.blitting.core {
 
 		public function set mouseEnabled( mouseEnabled : Boolean ) : void {
 			_mouseEnabled = mouseEnabled;
+		}
+
+		public function get useHandCursor() : Boolean {
+			return _useHandCursor;
+		}
+
+		public function set useHandCursor( useHandCursor : Boolean ) : void {
+			_useHandCursor = useHandCursor;
 		}
 	}
 }
