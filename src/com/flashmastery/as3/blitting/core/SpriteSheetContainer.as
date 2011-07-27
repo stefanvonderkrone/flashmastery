@@ -7,6 +7,7 @@ package com.flashmastery.as3.blitting.core {
 	public class SpriteSheetContainer extends SpriteSheet {
 		
 		protected var _children : Vector.<SpriteSheet>;
+		protected var _mouseChildren : Boolean = true;
 
 		public function SpriteSheetContainer() {
 			super();
@@ -15,6 +16,7 @@ package com.flashmastery.as3.blitting.core {
 		override protected function contruct() : void {
 			super.contruct();
 			_children = new Vector.<SpriteSheet>();
+			_mouseEnabled = true;
 		}
 
 		protected function isInvalidChild( child : SpriteSheet, container : SpriteSheetContainer ) : Boolean {
@@ -86,7 +88,7 @@ package com.flashmastery.as3.blitting.core {
 			if ( _children.indexOf( child ) > -1 ) {
 				_children.splice( _children.indexOf( child ), 1 );
 				child.blitting::bSetParent( null );
-				child.blitting::bSetRoot( null );
+				child.blitting::bSetRoot( child );
 				child.blitting::bSetStage( null );
 			}
 			return child;
@@ -97,7 +99,7 @@ package com.flashmastery.as3.blitting.core {
 			if ( child ) {
 				_children.splice( index, 1 );
 				child.blitting::bSetParent( null );
-				child.blitting::bSetRoot( null );
+				child.blitting::bSetRoot( child );
 				child.blitting::bSetStage( null );
 			}
 			return child;
@@ -131,27 +133,63 @@ package com.flashmastery.as3.blitting.core {
 			return _children;
 		}
 		
-		override public function getRectByCoords( targetCoordinateSpace : SpriteSheet ) : Rectangle {
-			var rect : Rectangle = super.getRectByCoords( targetCoordinateSpace );
+		override public function getRect() : Rectangle {
+			var rect : Rectangle = super.getRect();
 			var childRect : Rectangle;
 			var child : SpriteSheet;
 			var length : int = _children.length;
 			for ( var i : int = 0; i < length; i++ ) {
 				child = _children[ int( i ) ];
-				childRect = child.getRectByCoords( targetCoordinateSpace );
-				if ( childRect ) rect = rect.union( childRect );
+				if ( childRect == null ) childRect = child.getRect();
+				childRect = childRect.union( child.getRect() );
 			}
+			childRect.x += _rect.x;
+			childRect.y += _rect.y;
+			rect = rect.union( childRect );
 			return rect;
 		}
 		
+		override public function getRectByCoords( targetCoordinateSpace : SpriteSheet ) : Rectangle {
+			if ( contains( targetCoordinateSpace ) ) {
+				var rect : Rectangle = new Rectangle();
+//				trace(_name + ".getRectByCoords(targetCoordinateSpace)", rect);
+				var i : int;
+				if ( targetCoordinateSpace == this ) {
+					var child : SpriteSheet;
+					var childrenLength : int = _children.length;
+					var childRect : Rectangle;
+					for ( i = 0; i < childrenLength; i++ ) {
+						child = _children[ int( i ) ];
+						childRect = child.getRectByCoords( this );
+						rect = rect.union( childRect );
+					}
+//					trace(_name + ".getRectByCoords(targetCoordinateSpace)", rect);
+					return rect;
+				} else {
+					// TODO this contains targetCoordinateSpace
+				}
+			}
+			return super.getRectByCoords( targetCoordinateSpace );
+		}
+		
 		override public function get width() : int {
-			// TODO SpriteSheetContainer.width
+			if ( _children.length > 0 )
+				return getRectByCoords( this ).width;
 			return _rect.width;
 		}
 		
 		override public function get height() : int {
-			// TODO SpriteSheetContainer.height
+			if ( _children.length > 0 )
+				return getRectByCoords( this ).height;
 			return _rect.height;
+		}
+
+		public function get mouseChildren() : Boolean {
+			return _mouseChildren;
+		}
+
+		public function set mouseChildren( mouseChildren : Boolean ) : void {
+			_mouseChildren = mouseChildren;
 		}
 	}
 }

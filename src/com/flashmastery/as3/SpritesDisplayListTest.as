@@ -15,20 +15,25 @@ package com.flashmastery.as3 {
 		private function init( evt : Event = null ) : void {
 			removeEventListener( Event.ADDED_TO_STAGE, init );
 			var rect:Sprite;
-			for ( var i : int = 0; i < 10; i++ ) {
+			for ( var i : int = 0; i < 11; i++ ) {
 				rect = new Sprite();
 				rect.graphics.beginFill( 0 );
-				rect.graphics.drawRect( 0, 0, 10, 10 );
+				rect.graphics.drawRect( -5, -5, 10, 10 );
 				rect.graphics.endFill();
-				rect.x = i * 10;
-				rect.y = i * 10;
+				rect.x = i * 20;
+				rect.y = i * 20;
 				addChild( rect );
 			}
-			this.y = 10;
+			this.x = 100;
+			this.y = 100;
 			
 			trace(getRect(this)); // (x=50, y=40, w=40, h=40)
 			trace(getRect(stage)); // (x=50, y=50, w=40, h=40)
-			trace(stage.getRect(rect)); // (x=-90, y=-90, w=100, h=100)
+			trace(rect.getRect(stage)); // (x=50, y=50, w=40, h=40)
+//			trace(stage.getRect(rect)); // (x=-90, y=-90, w=100, h=100)
+//			trace( stage.width ); // 100
+//			trace( width ); // 100
+//			trace( rect.width ); // 10
 		}
 	}
 }

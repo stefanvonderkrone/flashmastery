@@ -38,6 +38,7 @@ package com.flashmastery.as3 {
 //			var rect : Rectangle = new Rectangle(0, 0, 100, 100);
 			for ( var i : int = 0; i < 2500; i++ ) {
 				sprite = new SpriteSheet();
+				sprite.mouseEnabled = true;
 				sprite.bitmapData = new BitmapData(100, 100, true);
 				sprite.bitmapData.perlinNoise(Math.random() * 2500, Math.random() * 2500, 4, Math.random() * 2500, true, true);
 //				sprite.bitmapData.fillRect(rect, 0xFF000000 + Math.random() * 0xFFFFFF);

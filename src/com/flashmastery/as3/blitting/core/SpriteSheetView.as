@@ -2,8 +2,11 @@ package com.flashmastery.as3.blitting.core {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.ui.Mouse;
+	import flash.ui.MouseCursor;
 
 	/**
 	 * @author Stefan von der Krone (2011)
@@ -13,7 +16,7 @@ package com.flashmastery.as3.blitting.core {
 		protected var _spriteSheetStage : SpriteSheetStage;
 		protected var _canvas : BitmapData;
 		protected var _canvasContainer : Bitmap;
-		protected var _backgroundColor : Number = 0;
+		protected var _backgroundColor : Number = 0xFF000000;//xFFFFFF;
 		protected var _renderPoint : Point;
 		protected var _containerPosition : Point;
 		protected var _renderRect : Rectangle;
@@ -21,6 +24,7 @@ package com.flashmastery.as3.blitting.core {
 		protected var _smoothing : Boolean = false;
 		protected var _width : Number;
 		protected var _height : Number;
+		protected var _currentMouseTarget : SpriteSheet;
 
 		public function SpriteSheetView() {
 			_renderPoint = new Point();
@@ -38,6 +42,64 @@ package com.flashmastery.as3.blitting.core {
 			_transparent = transparent;
 			_renderRect.width = _width;
 			_renderRect.height = _height;
+			addEventListener( MouseEvent.ROLL_OVER, rollOverHandler );
+			addEventListener( MouseEvent.ROLL_OUT, rollOutHandler );
+		}
+
+		protected function rollOutHandler( evt : MouseEvent ) : void {
+			Mouse.cursor = MouseCursor.AUTO;
+			removeEventListener( MouseEvent.MOUSE_MOVE, mouseMoveHandler );
+		}
+
+		protected function rollOverHandler( evt : MouseEvent ) : void {
+			Mouse.cursor = MouseCursor.ARROW;
+			addEventListener( MouseEvent.MOUSE_MOVE, mouseMoveHandler );
+		}
+
+		protected function mouseMoveHandler( evt : MouseEvent ) : void {
+			var mousePosition : Point = new Point( int( mouseX ), int( mouseY ) );
+			var currentTarget : SpriteSheet = getCurrentSpriteSheet( _spriteSheetStage, mousePosition );
+			if ( _currentMouseTarget != currentTarget ) {
+				if ( _currentMouseTarget ) dispatchBubblingEvent( _currentMouseTarget, new MouseEvent( MouseEvent.MOUSE_OUT ) );
+				Mouse.cursor = MouseCursor.ARROW;
+				_currentMouseTarget = currentTarget;
+				if ( _currentMouseTarget ) {
+					dispatchBubblingEvent( _currentMouseTarget, new MouseEvent( MouseEvent.MOUSE_OVER ) );
+					if ( _currentMouseTarget.useHandCursor ) Mouse.cursor = MouseCursor.BUTTON;
+				}
+//				if ( currentTarget ) trace("SpriteSheetView.mouseMoveHandler(evt)", currentTarget.name );
+			}
+		}
+
+		protected function dispatchBubblingEvent( target : SpriteSheet, mouseEvent : MouseEvent ) : void {
+			target.dispatchEvent( mouseEvent );
+			var targetParent : SpriteSheetContainer = target.parent;
+			for ( ; targetParent != null; ) {
+				targetParent.dispatchEvent( mouseEvent );
+				targetParent = target is SpriteSheetStage ? null : targetParent.parent;
+			}
+		}
+
+		protected function getCurrentSpriteSheet( container : SpriteSheet, position : Point ) : SpriteSheet {
+			var sprite : SpriteSheet;
+			var children : Vector.<SpriteSheet>;
+			var childrenLength : int;
+//			var rect : Rectangle = container.getRectByCoords( _spriteSheetStage );
+//			trace(position, rect, rect.bottom, rect.right, rect.containsPoint( position ));
+			if ( container.getRectByCoords( _spriteSheetStage ).containsPoint( position ) ) {
+				if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).numChildren > 0 && SpriteSheetContainer( container ).mouseChildren ) {
+					children = SpriteSheetContainer( container ).children;
+					childrenLength = children.length;
+					for ( var i : int = childrenLength - 1; i >= 0; i-- ) {
+						sprite = children[ int( i ) ];
+						sprite = getCurrentSpriteSheet( sprite, position );
+//						if ( sprite ) trace("\t", position, sprite.getRectByCoords( _spriteSheetStage ));
+						if ( sprite ) return sprite;
+					}
+				}
+				return container;
+			}
+			return null;
 		}
 		
 		public function render() : void {
@@ -124,6 +186,14 @@ package com.flashmastery.as3.blitting.core {
 		public function set smoothing( smoothing : Boolean ) : void {
 			_smoothing = smoothing;
 			_canvasContainer.smoothing = _smoothing;
+		}
+		
+		override public function set mouseChildren( enable : Boolean ) : void {
+			super.mouseChildren = enable;
+		}
+		
+		override public function set mouseEnabled( enabled : Boolean ) : void {
+			super.mouseEnabled = enabled;
 		}
 	}
 }
