@@ -15,6 +15,7 @@ package com.flashmastery.as3.blitting.core {
 		
 		protected static var spriteIndex : int = 0;
 		protected static const shapeColorMultiplier : uint = 16;
+		protected static const _hitTestZeroPoint : Point = new Point();
 		
 		protected var _bitmapData : BitmapData;
 		protected var _name : String;
@@ -24,8 +25,8 @@ package com.flashmastery.as3.blitting.core {
 		protected var _visible : Boolean = true;
 		protected var _x : int = 0;
 		protected var _y : int = 0;
-		protected var _registrationPointX : int = 0;
-		protected var _registrationPointY : int = 0;
+		protected var _registrationOffsetX : int = 0;
+		protected var _registrationOffsetY : int = 0;
 		protected var _mouseEnabled : Boolean = true;
 		protected var _useHandCursor : Boolean = false;
 		protected var _shapeColor : uint;
@@ -59,13 +60,15 @@ package com.flashmastery.as3.blitting.core {
 		public function getRectByCoords( targetCoordinateSpace : SpriteSheet ) : Rectangle {
 			// TODO targetCoordinateSpace is not in the iteration between stage/root and this
 			if ( targetCoordinateSpace == _parent ) return getRect();
-			else if ( targetCoordinateSpace && _parent ) {
+			else if ( targetCoordinateSpace == this ) {
+				return new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );
+			} else if ( targetCoordinateSpace && _parent ) {
 				var container : SpriteSheetContainer = _parent;
 				var rect : Rectangle = getRect();
 				for ( ; container != null; ) {
 					if ( container == _stage ) return rect;
-					rect.x += container.x - container.registrationPointX;
-					rect.y += container.y - container.registrationPointY;
+					rect.x += container.x + container.registrationOffsetX;
+					rect.y += container.y + container.registrationOffsetY;
 					container = container.parent;
 				}
 				return rect;
@@ -76,14 +79,19 @@ package com.flashmastery.as3.blitting.core {
 		public function globalToLocal( point : Point ) : Point {
 			var sprite : SpriteSheet = _stage || _root;
 			var localPoint : Point = point.clone();
+			localPoint.x += _registrationOffsetX;
+			localPoint.y += _registrationOffsetY;
 			var i : int;
 			var children : Vector.<SpriteSheet>;
 			var childrenLength : int;
 			var child : SpriteSheet;
 			for ( ; sprite != null; ) {
-				localPoint.x -= sprite.x - sprite.registrationPointX;
-				localPoint.y += sprite.y - sprite.registrationPointY;
-				if ( sprite == this ) return localPoint;
+//				trace(_name + ".globalToLocal(point)", point, localPoint, sprite.name);
+				localPoint.x -= sprite.x + sprite.registrationOffsetX;
+				localPoint.y -= sprite.y + sprite.registrationOffsetY;
+				if ( sprite == this ) {
+					return localPoint;
+				}
 				if ( sprite is SpriteSheetContainer ) {
 					children = SpriteSheetContainer( sprite ).children;
 					childrenLength = children.length;
@@ -96,16 +104,19 @@ package com.flashmastery.as3.blitting.core {
 					}
 				}
 			}
+//			trace(_name + ".globalToLocal(point)", point, localPoint);
 			return localPoint;
 		}
 		
 		public function localToGlobal( point : Point ) : Point {
 			var container : SpriteSheetContainer = _parent;
 			var globalPoint : Point = point.clone();
+			globalPoint.x += _x;
+			globalPoint.y += _y;
 			for ( ; container != null; ) {
 				if ( container == _stage ) return globalPoint;
-				globalPoint.x += container.x - container.registrationPointX;
-				globalPoint.y += container.y - container.registrationPointY;
+				globalPoint.x += container.x + container.registrationOffsetX;
+				globalPoint.y += container.y + container.registrationOffsetY;
 				container = container.parent;
 			}
 			return globalPoint;
@@ -120,6 +131,18 @@ package com.flashmastery.as3.blitting.core {
 			_bitmapData = bitmapData;
 			_rect.width = _bitmapData ? _bitmapData.width : 0;
 			_rect.height = _bitmapData ? _bitmapData.height : 0;
+		}
+		
+		public function hitsPointOfBitmap( point : Point ) : Boolean {
+			if ( _bitmapData && _bitmapData.transparent ) {
+				point = point.clone();
+				point.x -= _registrationOffsetX;
+				point.y -= _registrationOffsetY;
+				return _bitmapData.hitTest( _hitTestZeroPoint, 0, point );
+			}
+			var rect : Rectangle = new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );//getRectByCoords( this );
+//			trace(_name + ".hitsPoint(point)", point, _rect);
+			return rect.containsPoint( point );
 		}
 
 		public function get name() : String {
@@ -188,7 +211,7 @@ package com.flashmastery.as3.blitting.core {
 
 		public function set x( x : int ) : void {
 			_x = x;
-			_rect.x = _x - _registrationPointX;
+			_rect.x = _x + _registrationOffsetX;
 		}
 
 		public function get y() : int {
@@ -197,25 +220,25 @@ package com.flashmastery.as3.blitting.core {
 
 		public function set y( y : int ) : void {
 			_y = y;
-			_rect.y = _y - _registrationPointY;
+			_rect.y = _y + _registrationOffsetY;
 		}
 
-		public function get registrationPointX() : int {
-			return _registrationPointX;
+		public function get registrationOffsetX() : int {
+			return _registrationOffsetX;
 		}
 
-		public function set registrationPointX( registrationPointX : int ) : void {
-			_registrationPointX = registrationPointX;
-			_rect.x = _x - _registrationPointX;
+		public function set registrationOffsetX( registrationOffsetX : int ) : void {
+			_registrationOffsetX = registrationOffsetX;
+			_rect.x = _x + _registrationOffsetX;
 		}
 
-		public function get registrationPointY() : int {
-			return _registrationPointY;
+		public function get registrationOffsetY() : int {
+			return _registrationOffsetY;
 		}
 
-		public function set registrationPointY( registrationPointY : int ) : void {
-			_registrationPointY = registrationPointY;
-			_rect.y = _y - _registrationPointY;
+		public function set registrationOffsetY( registrationOffsetY : int ) : void {
+			_registrationOffsetY = registrationOffsetY;
+			_rect.y = _y + _registrationOffsetY;
 		}
 
 		public function get mouseEnabled() : Boolean {

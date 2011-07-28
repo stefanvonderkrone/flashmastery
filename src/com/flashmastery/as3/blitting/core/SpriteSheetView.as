@@ -49,17 +49,26 @@ package com.flashmastery.as3.blitting.core {
 		protected function rollOutHandler( evt : MouseEvent ) : void {
 			Mouse.cursor = MouseCursor.AUTO;
 			removeEventListener( MouseEvent.MOUSE_MOVE, mouseMoveHandler );
+			removeEventListener( MouseEvent.MOUSE_DOWN, mouseDownHandler );
+			removeEventListener( MouseEvent.MOUSE_UP, mouseUpHandler );
+			removeEventListener( MouseEvent.MOUSE_WHEEL, mouseWheelHandler );
+			removeEventListener( MouseEvent.CLICK, mouseClickHandler );
 		}
 
 		protected function rollOverHandler( evt : MouseEvent ) : void {
 			Mouse.cursor = MouseCursor.ARROW;
 			addEventListener( MouseEvent.MOUSE_MOVE, mouseMoveHandler );
+			addEventListener( MouseEvent.MOUSE_DOWN, mouseDownHandler );
+			addEventListener( MouseEvent.MOUSE_UP, mouseUpHandler );
+			addEventListener( MouseEvent.MOUSE_WHEEL, mouseWheelHandler );
+			addEventListener( MouseEvent.CLICK, mouseClickHandler );
 		}
 
 		protected function mouseMoveHandler( evt : MouseEvent ) : void {
 			var mousePosition : Point = new Point( int( mouseX ), int( mouseY ) );
 			var currentTarget : SpriteSheet = getCurrentSpriteSheet( _spriteSheetStage, mousePosition );
 			if ( _currentMouseTarget != currentTarget ) {
+				// MouseOver / MouseOut
 				if ( _currentMouseTarget ) dispatchBubblingEvent( _currentMouseTarget, new MouseEvent( MouseEvent.MOUSE_OUT ) );
 				Mouse.cursor = MouseCursor.ARROW;
 				_currentMouseTarget = currentTarget;
@@ -68,6 +77,32 @@ package com.flashmastery.as3.blitting.core {
 					if ( _currentMouseTarget.useHandCursor ) Mouse.cursor = MouseCursor.BUTTON;
 				}
 //				if ( currentTarget ) trace("SpriteSheetView.mouseMoveHandler(evt)", currentTarget.name );
+			} else {
+				// MouseMove
+			}
+		}
+
+		protected function mouseClickHandler( evt : MouseEvent ) : void {
+			if ( _currentMouseTarget ) {
+				// MouseClick
+			}
+		}
+
+		protected function mouseWheelHandler( evt : MouseEvent ) : void {
+			if ( _currentMouseTarget ) {
+				// MouseWheel
+			}
+		}
+
+		protected function mouseUpHandler( evt : MouseEvent ) : void {
+			if ( _currentMouseTarget ) {
+				// MouseUp
+			}
+		}
+
+		protected function mouseDownHandler( evt : MouseEvent ) : void {
+			if ( _currentMouseTarget ) {
+				// MouseDown
 			}
 		}
 
@@ -94,7 +129,8 @@ package com.flashmastery.as3.blitting.core {
 						sprite = children[ int( i ) ];
 						sprite = getCurrentSpriteSheet( sprite, position );
 //						if ( sprite ) trace("\t", position, sprite.getRectByCoords( _spriteSheetStage ));
-						if ( sprite ) return sprite;
+						if ( sprite && sprite.hitsPointOfBitmap( sprite.globalToLocal( position ) ) )
+							return sprite;
 					}
 				}
 				return container;
@@ -112,19 +148,20 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		protected function renderSpriteSheet( canvas : BitmapData, spriteSheet : SpriteSheet, containerPosition : Point ) : void {
-			_renderPoint.x = containerPosition.x + spriteSheet.x - spriteSheet.registrationPointX;
-			_renderPoint.y = containerPosition.y + spriteSheet.y - spriteSheet.registrationPointY;
-			_renderRect.width = spriteSheet.width;
-			_renderRect.height = spriteSheet.height;
+			_renderPoint.x = containerPosition.x + spriteSheet.x + spriteSheet.registrationOffsetX;
+			_renderPoint.y = containerPosition.y + spriteSheet.y + spriteSheet.registrationOffsetY;
 			if ( !spriteSheet.visible ) return;
-			if ( spriteSheet.bitmapData )
+			if ( spriteSheet.bitmapData ) {
+				_renderRect.width = spriteSheet.bitmapData.width;
+				_renderRect.height = spriteSheet.bitmapData.height;
 				canvas.copyPixels( spriteSheet.bitmapData, _renderRect, _renderPoint );
+			}
 			if ( spriteSheet is SpriteSheetContainer ) {
 				var children : Vector.<SpriteSheet> = SpriteSheetContainer( spriteSheet ).children;
 				var numSprites : int = children.length;
 				for ( var i : int = 0; i < numSprites; i++ ) {
-					containerPosition.x = spriteSheet.x + spriteSheet.registrationPointX;
-					containerPosition.y = spriteSheet.y + spriteSheet.registrationPointY;
+					containerPosition.x = spriteSheet.x + spriteSheet.registrationOffsetX;
+					containerPosition.y = spriteSheet.y + spriteSheet.registrationOffsetY;
 					renderSpriteSheet( canvas, children[ int( i ) ], containerPosition );
 				}
 			}
