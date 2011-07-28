@@ -55,12 +55,12 @@ package com.flashmastery.as3.blitting.core {
 			y;
 		}
 		
-		final override public function set registrationPointX( registrationPointX : int ) : void {
-			registrationPointX;
+		final override public function set registrationOffsetX( registrationOffsetX : int ) : void {
+			registrationOffsetX;
 		}
 		
-		final override public function set registrationPointY( registrationPointY : int ) : void {
-			registrationPointY;
+		final override public function set registrationOffsetY( registrationOffsetY : int ) : void {
+			registrationOffsetY;
 		}
 
 		public function get stageWidth() : Number {

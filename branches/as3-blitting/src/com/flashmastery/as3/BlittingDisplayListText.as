@@ -1,15 +1,17 @@
 package com.flashmastery.as3 {
-	import flash.events.MouseEvent;
 	import net.hires.debug.Stats;
-	import com.flashmastery.as3.blitting.core.SpriteSheetView;
-	import flash.geom.Rectangle;
+
 	import com.flashmastery.as3.blitting.core.SpriteSheet;
 	import com.flashmastery.as3.blitting.core.SpriteSheetContainer;
 	import com.flashmastery.as3.blitting.core.SpriteSheetStage;
+	import com.flashmastery.as3.blitting.core.SpriteSheetView;
 
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 
 	/**
 	 * @author Stefan von der Krone (2011)
@@ -36,21 +38,29 @@ package com.flashmastery.as3 {
 			_stage.addChild( container );
 //			trace( container.name );
 			var rect:SpriteSheet = new SpriteSheet();
-			var bitmapData : BitmapData = new BitmapData( 10, 10, true );
-			bitmapData.fillRect( new Rectangle( 0, 0, 10, 10 ), 0xFFFF0000 );
+			var bitmapData : BitmapData = new BitmapData( 50, 50, true, 0x00000000 );
+//			bitmapData.fillRect( new Rectangle( 0, 0, 50, 50 ), 0 );
+			bitmapData.fillRect( new Rectangle( 10, 10, 30, 30 ), 0xFFFF0000 );
+			container.x = 150;
+			container.y = 150;
+			container.registrationOffsetX = -50;
+			container.registrationOffsetY = -50;
 			for ( var i : int = 0; i < 11; i++ ) {
 				rect = new SpriteSheet();
 				rect.bitmapData = bitmapData;
-				rect.x = i * 20;
-				rect.y = i * 20;
-				rect.registrationPointX = 5;
-				rect.registrationPointY = 5;
+				rect.x = i * 70;
+				rect.y = i * 70;
+//				rect.registrationOffsetX = -25;
+//				rect.registrationOffsetY = -25;
 				rect.useHandCursor = true;
 				container.addChild( rect );
 //				trace( rect.name );
+//				trace( rect.localToGlobal( new Point( -10, -10 ) ) );
+//				trace( rect.globalToLocal( new Point( i * 70 - 10, i * 70 - 10 ) ) );
+				trace( rect.globalToLocal( new Point( 98, 98 ) ) );
+				trace( rect.localToGlobal( new Point( 0, 0 ) ) );
+//				trace( rect.getRectByCoords( _stage ) );
 			}
-			container.x = 100;
-			container.y = 100;
 			_stage.addEventListener( MouseEvent.MOUSE_OVER, mouseOverHandler );
 			_stage.addEventListener( MouseEvent.MOUSE_OUT, mouseOutHandler );
 			
@@ -59,6 +69,7 @@ package com.flashmastery.as3 {
 //			trace(container.getRectByCoords(_stage)); // (x=95, y=95, w=100, h=100)
 //			trace(container.getRect()); // (x=95, y=95, w=100, h=100)
 //			trace(rect.getRectByCoords( _stage )); // (x=95, y=95, w=100, h=100)
+			trace(rect.getRectByCoords( rect )); // (x=-25, y=-25, w=50, h=50)
 //			trace(_stage.getRectByCoords(rect)); // (x=0, y=10, w=100, h=100)
 //			trace( _stage.width ); // 100
 //			trace( container.width ); // 100
@@ -70,11 +81,11 @@ package com.flashmastery.as3 {
 		}
 
 		private function mouseOutHandler( evt : MouseEvent ) : void {
-//			trace("BlittingDisplayListText.mouseOutHandler(evt)", evt.currentTarget.name);
+			trace("BlittingDisplayListText.mouseOutHandler(evt)", evt.currentTarget.name);
 		}
 
 		private function mouseOverHandler( evt : MouseEvent ) : void {
-//			trace("BlittingDisplayListText.mouseOutHandler(evt)", evt.currentTarget.name);
+			trace("BlittingDisplayListText.mouseOutHandler(evt)", evt.currentTarget.name);
 		}
 
 		private function enterframeHandler( evt : Event ) : void {
