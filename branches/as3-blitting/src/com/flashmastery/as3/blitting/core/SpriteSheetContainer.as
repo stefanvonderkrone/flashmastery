@@ -1,4 +1,5 @@
 package com.flashmastery.as3.blitting.core {
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 
 	/**
@@ -8,6 +9,8 @@ package com.flashmastery.as3.blitting.core {
 		
 		protected var _children : Vector.<SpriteSheet>;
 		protected var _mouseChildren : Boolean = true;
+		
+		private var _innerCoordsRect : Rectangle;
 
 		public function SpriteSheetContainer() {
 			super();
@@ -16,7 +19,7 @@ package com.flashmastery.as3.blitting.core {
 		override protected function contruct() : void {
 			super.contruct();
 			_children = new Vector.<SpriteSheet>();
-			_mouseEnabled = true;
+			_innerCoordsRect = new Rectangle();
 		}
 
 		protected function isInvalidChild( child : SpriteSheet, container : SpriteSheetContainer ) : Boolean {
@@ -31,9 +34,11 @@ package com.flashmastery.as3.blitting.core {
 			if ( _children.indexOf( child ) > -1 )
 				_children.splice( _children.indexOf( child ), 1 );
 			_children.push( child );
-			child.blitting::bSetParent( this );
-			if ( root ) child.blitting::bSetRoot( root );
-			if ( stage ) child.blitting::bSetStage( stage );
+			child.bSetParent( this );
+			child.bMouseEnabled( _mouseChildren && _mouseEnabled );
+			child.bUseHandCursor( _useHandCursor );
+			if ( root ) child.bSetRoot( root );
+			if ( stage ) child.bSetStage( stage );
 			return child;
 		}
 
@@ -43,9 +48,11 @@ package com.flashmastery.as3.blitting.core {
 				_children.splice( _children.indexOf( child ), 1 );
 				 index < _children.length ? _children.splice( index, 0, child ) : _children.push( child );
 			} else _children.splice( index, 0, child );
-			child.blitting::bSetParent( this );
-			if ( root ) child.blitting::bSetRoot( root );
-			if ( stage ) child.blitting::bSetStage( stage );
+			child.bSetParent( this );
+			child.bMouseEnabled( _mouseChildren && _mouseEnabled );
+			child.bUseHandCursor( _useHandCursor );
+			if ( root ) child.bSetRoot( root );
+			if ( stage ) child.bSetStage( stage );
 			return child;
 		}
 
@@ -79,6 +86,19 @@ package com.flashmastery.as3.blitting.core {
 		public function getChildIndex( child : SpriteSheet ) : int {
 			return _children.indexOf( child );
 		}
+		
+		public function hitsPoint( point : Point ) : Boolean {
+			var length : int = _children.length;
+			var child : SpriteSheet;
+			for ( var i : int = 0; i < length; i++ ) {
+				child = _children[ int( i ) ];
+				if ( child is SpriteSheetContainer && SpriteSheetContainer( child ).hitsPoint( point ) )
+					return true;
+				else if ( child.hitsPointOfBitmap( point ) )
+					return true;
+			}
+			return hitsPointOfBitmap( point );
+		}
 
 		public function get numChildren() : int {
 			return _children.length;
@@ -87,9 +107,9 @@ package com.flashmastery.as3.blitting.core {
 		public function removeChild( child : SpriteSheet ) : SpriteSheet {
 			if ( _children.indexOf( child ) > -1 ) {
 				_children.splice( _children.indexOf( child ), 1 );
-				child.blitting::bSetParent( null );
-				child.blitting::bSetRoot( child );
-				child.blitting::bSetStage( null );
+				child.bSetParent( null );
+				child.bSetRoot( child );
+				child.bSetStage( null );
 			}
 			return child;
 		}
@@ -98,9 +118,9 @@ package com.flashmastery.as3.blitting.core {
 			var child : SpriteSheet = index < _children.length ? _children[ index ] : null;
 			if ( child ) {
 				_children.splice( index, 1 );
-				child.blitting::bSetParent( null );
-				child.blitting::bSetRoot( child );
-				child.blitting::bSetStage( null );
+				child.bSetParent( null );
+				child.bSetRoot( child );
+				child.bSetStage( null );
 			}
 			return child;
 		}
@@ -151,7 +171,10 @@ package com.flashmastery.as3.blitting.core {
 		
 		override public function getRectByCoords( targetCoordinateSpace : SpriteSheet ) : Rectangle {
 			if ( contains( targetCoordinateSpace ) ) {
-				var rect : Rectangle = new Rectangle();
+				_innerCoordsRect.x = 0;
+				_innerCoordsRect.y = 0;
+				_innerCoordsRect.width = 0;
+				_innerCoordsRect.height = 0;
 //				trace(_name + ".getRectByCoords(targetCoordinateSpace)", rect);
 				var i : int;
 				if ( targetCoordinateSpace == this ) {
@@ -161,10 +184,10 @@ package com.flashmastery.as3.blitting.core {
 					for ( i = 0; i < childrenLength; i++ ) {
 						child = _children[ int( i ) ];
 						childRect = child.getRectByCoords( this );
-						rect = rect.union( childRect );
+						_innerCoordsRect = _innerCoordsRect.union( childRect );
 					}
 //					trace(_name + ".getRectByCoords(targetCoordinateSpace)", rect);
-					return rect;
+					return _innerCoordsRect;
 				} else {
 					// TODO this contains targetCoordinateSpace
 				}
@@ -190,6 +213,23 @@ package com.flashmastery.as3.blitting.core {
 
 		public function set mouseChildren( mouseChildren : Boolean ) : void {
 			_mouseChildren = mouseChildren;
+			var length : int = _children.length;
+			for ( var i : int = 0; i < length; i++ )
+				_children[ int( i ) ].bMouseEnabled( !( _mouseChildren || _mouseEnabled ) );
+		}
+		
+		override public function set mouseEnabled( mouseEnabled : Boolean ) : void {
+			_mouseEnabled = mouseEnabled;
+			var length : int = _children.length;
+			for ( var i : int = 0; i < length; i++ )
+				_children[ int( i ) ].bMouseEnabled( !( _mouseChildren || _mouseEnabled ) );
+		}
+		
+		override public function set useHandCursor( useHandCursor : Boolean ) : void {
+			_useHandCursor = useHandCursor;
+			var length : int = _children.length;
+			for ( var i : int = 0; i < length; i++ )
+				_children[ int( i ) ].bUseHandCursor( useHandCursor );
 		}
 	}
 }

@@ -7,6 +7,13 @@ package com.flashmastery.as3.blitting.core {
 	
 	[Event(name="added", type="flash.events.Event")]
 	[Event(name="addedToStage", type="flash.events.Event")]
+	[Event(name="sMouseWheel", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+	[Event(name="sMouseMove", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+	[Event(name="sMouseOver", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+	[Event(name="sClick", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+	[Event(name="sMouseOut", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+	[Event(name="sMouseUp", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+	[Event(name="sMouseDown", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
 
 	/**
 	 * @author Stefan von der Krone (2011)
@@ -28,9 +35,12 @@ package com.flashmastery.as3.blitting.core {
 		protected var _registrationOffsetX : int = 0;
 		protected var _registrationOffsetY : int = 0;
 		protected var _mouseEnabled : Boolean = true;
+		protected var _bMouseEnabled : Boolean = true;
 		protected var _useHandCursor : Boolean = false;
+		protected var _bUseHandCursor : Boolean = false;
 		protected var _shapeColor : uint;
 		protected var _rect : Rectangle;
+		protected var _bitmapDataHitTestRect : Rectangle;
 
 		public function SpriteSheet() {
 			super();
@@ -41,6 +51,7 @@ package com.flashmastery.as3.blitting.core {
 			_name = "spriteSheet" + spriteIndex.toString();
 			_shapeColor = shapeColorMultiplier * ( spriteIndex + 1 );
 			_rect = new Rectangle();
+			_bitmapDataHitTestRect = new Rectangle();
 			_root = this;
 			spriteIndex++;
 		}
@@ -61,7 +72,7 @@ package com.flashmastery.as3.blitting.core {
 			// TODO targetCoordinateSpace is not in the iteration between stage/root and this
 			if ( targetCoordinateSpace == _parent ) return getRect();
 			else if ( targetCoordinateSpace == this ) {
-				return new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );
+				return _bitmapDataHitTestRect.clone();//new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );
 			} else if ( targetCoordinateSpace && _parent ) {
 				var container : SpriteSheetContainer = _parent;
 				var rect : Rectangle = getRect();
@@ -129,8 +140,8 @@ package com.flashmastery.as3.blitting.core {
 		public function set bitmapData( bitmapData : BitmapData ) : void {
 			if ( _bitmapData == bitmapData ) return;
 			_bitmapData = bitmapData;
-			_rect.width = _bitmapData ? _bitmapData.width : 0;
-			_rect.height = _bitmapData ? _bitmapData.height : 0;
+			_rect.width = _bitmapDataHitTestRect.width = _bitmapData ? _bitmapData.width : 0;
+			_rect.height = _bitmapDataHitTestRect.height = _bitmapData ? _bitmapData.height : 0;
 		}
 		
 		public function hitsPointOfBitmap( point : Point ) : Boolean {
@@ -140,9 +151,9 @@ package com.flashmastery.as3.blitting.core {
 				point.y -= _registrationOffsetY;
 				return _bitmapData.hitTest( _hitTestZeroPoint, 0, point );
 			}
-			var rect : Rectangle = new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );//getRectByCoords( this );
+//			_bitmapDataHitTestRect = new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );//getRectByCoords( this );
 //			trace(_name + ".hitsPoint(point)", point, _rect);
-			return rect.containsPoint( point );
+			return _bitmapDataHitTestRect.containsPoint( point );
 		}
 
 		public function get name() : String {
@@ -157,44 +168,32 @@ package com.flashmastery.as3.blitting.core {
 			return _parent;
 		}
 
-		blitting function bSetParent( parent : SpriteSheetContainer ) : void {
+		public function bSetParent( parent : SpriteSheetContainer ) : void {
 			if ( parent != _parent ) {
-				setParent( parent );
+				_parent = parent;
 				if ( _parent ) dispatchEvent( new Event( Event.ADDED ) );
 				else dispatchEvent( new Event( Event.REMOVED ) );
 			}
-		}
-		
-		protected function setParent( parent : SpriteSheetContainer ) : void {
-			_parent = parent;
 		}
 
 		public function get root() : SpriteSheet {
 			return _root;
 		}
 
-		blitting function bSetRoot( root : SpriteSheet ) : void {
-			if ( root != _root ) setRoot( root );
-		}
-		
-		protected function setRoot( root : SpriteSheet ) : void {
-			_root = root;
+		public function bSetRoot( root : SpriteSheet ) : void {
+			if ( root != _root ) _root = root;
 		}
 
 		public function get stage() : SpriteSheetStage {
 			return _stage;
 		}
 
-		blitting function bSetStage( stage : SpriteSheetStage ) : void {
+		public function bSetStage( stage : SpriteSheetStage ) : void {
 			if ( stage != _stage ) {
-				setStage( stage );
+				_stage = stage;
 				if ( _stage ) dispatchEvent( new Event( Event.ADDED_TO_STAGE ) );
 				else dispatchEvent( new Event( Event.REMOVED_FROM_STAGE ) );
 			}
-		}
-		
-		protected function setStage( stage : SpriteSheetStage ) : void {
-			_stage = stage;
 		}
 
 		public function get visible() : Boolean {
@@ -230,6 +229,7 @@ package com.flashmastery.as3.blitting.core {
 		public function set registrationOffsetX( registrationOffsetX : int ) : void {
 			_registrationOffsetX = registrationOffsetX;
 			_rect.x = _x + _registrationOffsetX;
+			_bitmapDataHitTestRect.x = _registrationOffsetX;
 		}
 
 		public function get registrationOffsetY() : int {
@@ -239,22 +239,31 @@ package com.flashmastery.as3.blitting.core {
 		public function set registrationOffsetY( registrationOffsetY : int ) : void {
 			_registrationOffsetY = registrationOffsetY;
 			_rect.y = _y + _registrationOffsetY;
+			_bitmapDataHitTestRect.y = _registrationOffsetY;
 		}
 
 		public function get mouseEnabled() : Boolean {
-			return _mouseEnabled;
+			return _mouseEnabled && _bMouseEnabled;
 		}
 
 		public function set mouseEnabled( mouseEnabled : Boolean ) : void {
 			_mouseEnabled = mouseEnabled;
 		}
 
+		public function bMouseEnabled( bMouseEnabled : Boolean ) : void {
+			_bMouseEnabled = bMouseEnabled;
+		}
+
 		public function get useHandCursor() : Boolean {
-			return _useHandCursor;
+			return _useHandCursor || _bUseHandCursor;
 		}
 
 		public function set useHandCursor( useHandCursor : Boolean ) : void {
 			_useHandCursor = useHandCursor;
+		}
+
+		public function bUseHandCursor( bUseHandCursor : Boolean ) : void {
+			_bUseHandCursor = bUseHandCursor;
 		}
 	}
 }

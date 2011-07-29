@@ -1,7 +1,5 @@
 package com.flashmastery.as3.blitting.core {
 	
-	use namespace blitting;
-
 	/**
 	 * @author Stefan von der Krone (2011)
 	 */
@@ -35,11 +33,11 @@ package com.flashmastery.as3.blitting.core {
 			return child;
 		}
 		
-		final override protected function setRoot( root : SpriteSheet ) : void {
+		final override public function bSetRoot( root : SpriteSheet ) : void {
 			root;
 		}
 		
-		final override protected function setStage( stage : SpriteSheetStage ) : void {
+		final override public function bSetStage( stage : SpriteSheetStage ) : void {
 			stage;
 		}
 		
@@ -67,7 +65,7 @@ package com.flashmastery.as3.blitting.core {
 			return _stageWidth;
 		}
 
-		blitting function setStageWidth( stageWidth : Number ) : void {
+		public final function bSetStageWidth( stageWidth : Number ) : void {
 			_stageWidth = stageWidth;
 		}
 
@@ -75,7 +73,7 @@ package com.flashmastery.as3.blitting.core {
 			return _stageHeight;
 		}
 
-		blitting function setStageHeight( stageHeight : Number ) : void {
+		public final function bSetStageHeight( stageHeight : Number ) : void {
 			_stageHeight = stageHeight;
 		}
 	}

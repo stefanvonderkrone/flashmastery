@@ -1,4 +1,6 @@
 package com.flashmastery.as3.blitting.core {
+	import com.flashmastery.as3.blitting.events.SpriteSheetEvent;
+
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
@@ -25,11 +27,13 @@ package com.flashmastery.as3.blitting.core {
 		protected var _width : Number;
 		protected var _height : Number;
 		protected var _currentMouseTarget : SpriteSheet;
+		private var _mousePosition : Point;
 
 		public function SpriteSheetView() {
 			_renderPoint = new Point();
 			_containerPosition = new Point();
 			_renderRect = new Rectangle();
+			_mousePosition = new Point();
 		}
 
 		public function initWithDimensions( width : Number, height : Number, transparent : Boolean = false ) : void {
@@ -65,75 +69,96 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		protected function mouseMoveHandler( evt : MouseEvent ) : void {
-			var mousePosition : Point = new Point( int( mouseX ), int( mouseY ) );
-			var currentTarget : SpriteSheet = getCurrentSpriteSheet( _spriteSheetStage, mousePosition );
+			_mousePosition.x = int( mouseX );
+			_mousePosition.y = int( mouseY );
+			var currentTarget : SpriteSheet = getCurrentSpriteSheetUnderPoint( _spriteSheetStage, _mousePosition );
 			if ( _currentMouseTarget != currentTarget ) {
 				// MouseOver / MouseOut
-				if ( _currentMouseTarget ) dispatchBubblingEvent( _currentMouseTarget, new MouseEvent( MouseEvent.MOUSE_OUT ) );
+				if ( _currentMouseTarget )
+					dispatchBubblingEvent( SpriteSheetEvent.MOUSE_OUT, _currentMouseTarget, _mousePosition, 0 );
 				Mouse.cursor = MouseCursor.ARROW;
 				_currentMouseTarget = currentTarget;
 				if ( _currentMouseTarget ) {
-					dispatchBubblingEvent( _currentMouseTarget, new MouseEvent( MouseEvent.MOUSE_OVER ) );
-					if ( _currentMouseTarget.useHandCursor ) Mouse.cursor = MouseCursor.BUTTON;
+					dispatchBubblingEvent( SpriteSheetEvent.MOUSE_OVER, _currentMouseTarget, _mousePosition, 0 );
+					dispatchBubblingEvent( SpriteSheetEvent.MOUSE_MOVE, _currentMouseTarget, _mousePosition, 0 );
+					if ( _currentMouseTarget.useHandCursor && _currentMouseTarget.mouseEnabled )
+						Mouse.cursor = MouseCursor.BUTTON;
 				}
 //				if ( currentTarget ) trace("SpriteSheetView.mouseMoveHandler(evt)", currentTarget.name );
 			} else {
 				// MouseMove
+				dispatchBubblingEvent( SpriteSheetEvent.MOUSE_MOVE, _currentMouseTarget || _spriteSheetStage, _mousePosition, 0 );
 			}
 		}
 
 		protected function mouseClickHandler( evt : MouseEvent ) : void {
+			_mousePosition.x = int( mouseX );
+			_mousePosition.y = int( mouseY );
 			if ( _currentMouseTarget ) {
 				// MouseClick
+				dispatchBubblingEvent( SpriteSheetEvent.CLICK, _currentMouseTarget, _mousePosition, 0 );
 			}
 		}
 
 		protected function mouseWheelHandler( evt : MouseEvent ) : void {
+			_mousePosition.x = int( mouseX );
+			_mousePosition.y = int( mouseY );
 			if ( _currentMouseTarget ) {
 				// MouseWheel
+				dispatchBubblingEvent( SpriteSheetEvent.MOUSE_WHEEL, _currentMouseTarget, _mousePosition, evt.delta );
 			}
 		}
 
 		protected function mouseUpHandler( evt : MouseEvent ) : void {
+			_mousePosition.x = int( mouseX );
+			_mousePosition.y = int( mouseY );
 			if ( _currentMouseTarget ) {
 				// MouseUp
+				dispatchBubblingEvent( SpriteSheetEvent.MOUSE_UP, _currentMouseTarget, _mousePosition, 0 );
 			}
 		}
 
 		protected function mouseDownHandler( evt : MouseEvent ) : void {
+			_mousePosition.x = int( mouseX );
+			_mousePosition.y = int( mouseY );
 			if ( _currentMouseTarget ) {
 				// MouseDown
+				dispatchBubblingEvent( SpriteSheetEvent.MOUSE_DOWN, _currentMouseTarget, _mousePosition, 0 );
 			}
 		}
 
-		protected function dispatchBubblingEvent( target : SpriteSheet, mouseEvent : MouseEvent ) : void {
-			target.dispatchEvent( mouseEvent );
+		protected function dispatchBubblingEvent( type : String, target : SpriteSheet, stageCoords : Point, delta : int ) : void {
 			var targetParent : SpriteSheetContainer = target.parent;
+			var newTarget : SpriteSheet;
+			if ( target.mouseEnabled && target.hasEventListener( type ) )
+				target.dispatchEvent( new SpriteSheetEvent( type, target, target, target.globalToLocal( stageCoords ), stageCoords, delta ) );
 			for ( ; targetParent != null; ) {
-				targetParent.dispatchEvent( mouseEvent );
-				targetParent = target is SpriteSheetStage ? null : targetParent.parent;
+				newTarget = targetParent;
+				targetParent = newTarget is SpriteSheetStage ? null : newTarget.parent;
+//				if ( newTarget.hasEventListener( type ) && ( newTarget is SpriteSheetStage || ( targetParent && targetParent.mouseChildren && targetParent.mouseEnabled ) ) )
+				if ( newTarget.mouseEnabled && newTarget.hasEventListener( type ) )
+					newTarget.dispatchEvent( new SpriteSheetEvent( type, target, newTarget, newTarget.globalToLocal( stageCoords ), stageCoords, delta ) );
 			}
 		}
 
-		protected function getCurrentSpriteSheet( container : SpriteSheet, position : Point ) : SpriteSheet {
+		protected function getCurrentSpriteSheetUnderPoint( container : SpriteSheet, point : Point ) : SpriteSheet {
 			var sprite : SpriteSheet;
 			var children : Vector.<SpriteSheet>;
 			var childrenLength : int;
-//			var rect : Rectangle = container.getRectByCoords( _spriteSheetStage );
-//			trace(position, rect, rect.bottom, rect.right, rect.containsPoint( position ));
-			if ( container.getRectByCoords( _spriteSheetStage ).containsPoint( position ) ) {
-				if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).numChildren > 0 && SpriteSheetContainer( container ).mouseChildren ) {
+			if ( container.getRectByCoords( _spriteSheetStage ).containsPoint( point ) ) {
+				if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).numChildren > 0 ) {
 					children = SpriteSheetContainer( container ).children;
 					childrenLength = children.length;
 					for ( var i : int = childrenLength - 1; i >= 0; i-- ) {
 						sprite = children[ int( i ) ];
-						sprite = getCurrentSpriteSheet( sprite, position );
-//						if ( sprite ) trace("\t", position, sprite.getRectByCoords( _spriteSheetStage ));
-						if ( sprite && sprite.hitsPointOfBitmap( sprite.globalToLocal( position ) ) )
+						sprite = getCurrentSpriteSheetUnderPoint( sprite, point );
+						if ( sprite && sprite.hitsPointOfBitmap( sprite.globalToLocal( point ) ) )
 							return sprite;
 					}
-				}
-				return container;
+				} else if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).hitsPoint( container.globalToLocal( point ) ) )
+					return container;
+				else if ( container.hitsPointOfBitmap( container.globalToLocal( point ) ) )
+					return container;
 			}
 			return null;
 		}
