@@ -163,9 +163,11 @@ package com.flashmastery.as3.blitting.core {
 				if ( childRect == null ) childRect = child.getRect();
 				childRect = childRect.union( child.getRect() );
 			}
-			childRect.x += _rect.x;
-			childRect.y += _rect.y;
-			rect = rect.union( childRect );
+			if ( childRect ) {
+				childRect.x += _rect.x;
+				childRect.y += _rect.y;
+				rect = rect.union( childRect );
+			}
 			return rect;
 		}
 		

@@ -68,7 +68,7 @@ package com.flashmastery.as3.blitting.core {
 			addEventListener( MouseEvent.CLICK, mouseClickHandler );
 		}
 
-		protected function mouseMoveHandler( evt : MouseEvent ) : void {
+		protected function mouseMoveHandler( evt : MouseEvent = null ) : void {
 			_mousePosition.x = int( mouseX );
 			_mousePosition.y = int( mouseY );
 			var currentTarget : SpriteSheet = getCurrentSpriteSheetUnderPoint( _spriteSheetStage, _mousePosition );
@@ -84,7 +84,6 @@ package com.flashmastery.as3.blitting.core {
 					if ( _currentMouseTarget.useHandCursor && _currentMouseTarget.mouseEnabled )
 						Mouse.cursor = MouseCursor.BUTTON;
 				}
-//				if ( currentTarget ) trace("SpriteSheetView.mouseMoveHandler(evt)", currentTarget.name );
 			} else {
 				// MouseMove
 				dispatchBubblingEvent( SpriteSheetEvent.MOUSE_MOVE, _currentMouseTarget || _spriteSheetStage, _mousePosition, 0 );
@@ -135,7 +134,6 @@ package com.flashmastery.as3.blitting.core {
 			for ( ; targetParent != null; ) {
 				newTarget = targetParent;
 				targetParent = newTarget is SpriteSheetStage ? null : newTarget.parent;
-//				if ( newTarget.hasEventListener( type ) && ( newTarget is SpriteSheetStage || ( targetParent && targetParent.mouseChildren && targetParent.mouseEnabled ) ) )
 				if ( newTarget.mouseEnabled && newTarget.hasEventListener( type ) )
 					newTarget.dispatchEvent( new SpriteSheetEvent( type, target, newTarget, newTarget.globalToLocal( stageCoords ), stageCoords, delta ) );
 			}
@@ -170,12 +168,14 @@ package com.flashmastery.as3.blitting.core {
 			if ( _spriteSheetStage )
 				renderSpriteSheet( _canvas, _spriteSheetStage, _containerPosition );
 			_canvas.unlock();
+			if ( hasEventListener( MouseEvent.MOUSE_MOVE ) ) mouseMoveHandler();
 		}
 
 		protected function renderSpriteSheet( canvas : BitmapData, spriteSheet : SpriteSheet, containerPosition : Point ) : void {
 			_renderPoint.x = containerPosition.x + spriteSheet.x + spriteSheet.registrationOffsetX;
 			_renderPoint.y = containerPosition.y + spriteSheet.y + spriteSheet.registrationOffsetY;
 			if ( !spriteSheet.visible ) return;
+			spriteSheet.updateForRender();
 			if ( spriteSheet.bitmapData ) {
 				_renderRect.width = spriteSheet.bitmapData.width;
 				_renderRect.height = spriteSheet.bitmapData.height;
