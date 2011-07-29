@@ -265,5 +265,8 @@ package com.flashmastery.as3.blitting.core {
 		public function bUseHandCursor( bUseHandCursor : Boolean ) : void {
 			_bUseHandCursor = bUseHandCursor;
 		}
+		
+		public function updateForRender() : void {
+		}
 	}
 }
