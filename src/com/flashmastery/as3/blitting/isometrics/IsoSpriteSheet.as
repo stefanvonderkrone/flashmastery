@@ -12,6 +12,7 @@ package com.flashmastery.as3.blitting.isometrics {
 		protected var _cellSizeX : uint = 50;
 		protected var _cellSizeY : uint = 25;
 		protected var _cellSizeZ : uint = 25;
+		protected var _flattenedPosY : Number;
 
 		public function IsoSpriteSheet() {
 			super();
@@ -73,7 +74,13 @@ package com.flashmastery.as3.blitting.isometrics {
 
 		protected function updateCoords() : void {
 			x = _isoX * _cellSizeX / 2 - _isoY * _cellSizeX / 2;
+			y = _isoX * _cellSizeY / 2 + _isoY * _cellSizeY / 2;
+			_flattenedPosY = _y;
 			y = _isoX * _cellSizeY / 2 + _isoY * _cellSizeY / 2 - _isoZ * _cellSizeZ;
+		}
+
+		public function get flattenedPosY() : Number {
+			return _flattenedPosY;
 		}
 	}
 }

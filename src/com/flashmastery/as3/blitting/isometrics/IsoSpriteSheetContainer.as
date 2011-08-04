@@ -67,5 +67,28 @@ package com.flashmastery.as3.blitting.isometrics {
 					IsoSpriteSheet( child ).cellSizeZ = _cellSizeZ;
 			}
 		}
+		
+		override public function updateForRender() : void {
+			if ( _children.length > 0 )
+				sortChildren( _children );
+		}
+
+		protected function sortChildren( children : Vector.<SpriteSheet> ) : void {
+			var sortList : Array = [];
+			var unsortedList : Array = [];
+			var i : int;
+			var length : uint = children.length;
+			var child : SpriteSheet;
+			for ( i = 0; i < length; i++ ) {
+				child = children[int( i )];
+				if ( child is IsoSpriteSheet )
+					sortList.push( child );
+				else unsortedList.push( child );
+			}
+			sortList.sortOn( "flattenedPosY", Array.NUMERIC );
+			sortList = unsortedList.concat( sortList );
+			for ( i = 0; i < length; i++ )
+				_children[ int( i ) ] = sortList[ int( i ) ];
+		}
 	}
 }
