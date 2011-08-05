@@ -184,10 +184,10 @@ package com.flashmastery.as3.blitting.core {
 			if ( spriteSheet is SpriteSheetContainer ) {
 				var children : Vector.<SpriteSheet> = SpriteSheetContainer( spriteSheet ).children;
 				var numSprites : int = children.length;
-				var spritePosition : Point = containerPosition.clone();
+				var spritePosition : Point = new Point();
+				spritePosition.x = containerPosition.x + spriteSheet.x + spriteSheet.registrationOffsetX;
+				spritePosition.y = containerPosition.y + spriteSheet.y + spriteSheet.registrationOffsetY;
 				for ( var i : int = 0; i < numSprites; i++ ) {
-					spritePosition.x = containerPosition.x + spriteSheet.x + spriteSheet.registrationOffsetX;
-					spritePosition.y = containerPosition.y + spriteSheet.y + spriteSheet.registrationOffsetY;
 					renderSpriteSheet( canvas, children[ int( i ) ], spritePosition );
 				}
 			}
