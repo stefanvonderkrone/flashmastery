@@ -44,10 +44,10 @@ package com.flashmastery.as3.blitting.core {
 
 		public function SpriteSheet() {
 			super();
-			contruct();
+			construct();
 		}
 
-		protected function contruct() : void {
+		protected function construct() : void {
 			_name = "spriteSheet" + spriteIndex.toString();
 			_shapeColor = shapeColorMultiplier * ( spriteIndex + 1 );
 			_rect = new Rectangle();

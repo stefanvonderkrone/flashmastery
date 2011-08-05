@@ -13,8 +13,8 @@ package com.flashmastery.as3.blitting.core {
 			super();
 		}
 		
-		override protected function contruct() : void {
-			super.contruct();
+		override protected function construct() : void {
+			super.construct();
 			_stage = this;
 			_root = this;
 		}
