@@ -11,8 +11,8 @@ package com.flashmastery.as3.blitting.isometrics {
 			super();
 		}
 		
-		override protected function contruct() : void {
-			super.contruct();
+		override protected function construct() : void {
+			super.construct();
 		}
 		
 		override public function addChild( child : SpriteSheet ) : SpriteSheet {
