@@ -33,6 +33,8 @@ package com.flashmastery.as3.blitting.core {
 			if ( isInvalidChild( child, this ) || child == this ) return null;
 			if ( _children.indexOf( child ) > -1 )
 				_children.splice( _children.indexOf( child ), 1 );
+			else if ( child.parent && child.parent != this )
+				child.parent.removeChild( child );
 			_children.push( child );
 			child.bSetParent( this );
 			child.bMouseEnabled( _mouseChildren && _mouseEnabled );
@@ -47,7 +49,11 @@ package com.flashmastery.as3.blitting.core {
 			if ( _children.indexOf( child ) > -1 ) {
 				_children.splice( _children.indexOf( child ), 1 );
 				 index < _children.length ? _children.splice( index, 0, child ) : _children.push( child );
-			} else _children.splice( index, 0, child );
+			} else {
+				if ( child.parent && child.parent != this )
+					child.parent.removeChild( child );
+				_children.splice( index, 0, child );
+			}
 			child.bSetParent( this );
 			child.bMouseEnabled( _mouseChildren && _mouseEnabled );
 			child.bUseHandCursor( _useHandCursor );
@@ -207,6 +213,24 @@ package com.flashmastery.as3.blitting.core {
 			if ( _children.length > 0 )
 				return getRectByCoords( this ).height;
 			return _rect.height;
+		}
+		
+		override public function bSetRoot( root : SpriteSheet ) : void {
+			if ( root != _root ) {
+				super.bSetRoot( root );
+				const length : int = _children.length;
+				for ( var i : int = 0; i < length; i++ )
+					_children[ int( i ) ].bSetRoot( root );
+			}
+		}
+		
+		override public function bSetStage( stage : SpriteSheetStage ) : void {
+			if ( stage != _stage ) {
+				super.bSetStage( stage );
+				const length : int = _children.length;
+				for ( var i : int = 0; i < length; i++ )
+					_children[ int( i ) ].bSetStage( stage );
+			}
 		}
 
 		public function get mouseChildren() : Boolean {

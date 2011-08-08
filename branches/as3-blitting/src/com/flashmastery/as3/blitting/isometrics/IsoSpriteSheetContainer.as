@@ -6,13 +6,8 @@ package com.flashmastery.as3.blitting.isometrics {
 	 */
 	public class IsoSpriteSheetContainer extends IsoSpriteSheet {
 		
-
 		public function IsoSpriteSheetContainer() {
 			super();
-		}
-		
-		override protected function construct() : void {
-			super.construct();
 		}
 		
 		override public function addChild( child : SpriteSheet ) : SpriteSheet {

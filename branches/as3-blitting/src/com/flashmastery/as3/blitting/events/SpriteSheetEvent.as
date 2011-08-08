@@ -17,6 +17,7 @@ package com.flashmastery.as3.blitting.events {
 //		public static const DOUBLE_CLICK : String = "doubleClick";
 		public static const MOUSE_DOWN : String = "sMouseDown";
 //		public static const ROLL_OVER : String = "rollOver";
+		public static const ENTER_FRAME : String = "sEnterframe";
 
 		protected var _target : Object;
 		protected var _currentTarget : Object;
@@ -24,7 +25,7 @@ package com.flashmastery.as3.blitting.events {
 		protected var _stageCoords : Point;
 		protected var _delta : int;
 
-		public function SpriteSheetEvent( type : String, target : Object, currentTarget : Object, localCoords : Point, stageCoords : Point, delta : int ) {
+		public function SpriteSheetEvent( type : String, target : Object = null, currentTarget : Object = null, localCoords : Point = null, stageCoords : Point = null, delta : int = 0 ) {
 			super( type, false, false );
 			_target = target;
 			_currentTarget = currentTarget;
@@ -34,11 +35,11 @@ package com.flashmastery.as3.blitting.events {
 		}
 		
 		override public function get target() : Object {
-			return _target;
+			return _target != null ? _target : super.target;
 		}
 		
 		override public function get currentTarget() : Object {
-			return _currentTarget;
+			return _currentTarget != null ? _currentTarget : super.currentTarget;
 		}
 
 		public function get localCoords() : Point {
@@ -54,7 +55,7 @@ package com.flashmastery.as3.blitting.events {
 		}
 		
 		override public function clone() : Event {
-			return new SpriteSheetEvent(type, _target, _currentTarget, _localCoords, _stageCoords, _delta);
+			return new SpriteSheetEvent(type, target, currentTarget, _localCoords, _stageCoords, _delta);
 		}
 		
 		override public function toString() : String {
