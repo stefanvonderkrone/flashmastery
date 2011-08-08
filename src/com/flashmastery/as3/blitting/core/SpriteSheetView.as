@@ -10,6 +10,8 @@ package com.flashmastery.as3.blitting.core {
 	import flash.ui.Mouse;
 	import flash.ui.MouseCursor;
 
+	[Event(name="sEnterframe", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
+
 	/**
 	 * @author Stefan von der Krone (2011)
 	 */
@@ -162,6 +164,8 @@ package com.flashmastery.as3.blitting.core {
 		}
 		
 		public function render() : void {
+			if ( hasEventListener( SpriteSheetEvent.ENTER_FRAME ) )
+				dispatchEvent( new SpriteSheetEvent(SpriteSheetEvent.ENTER_FRAME ) );
 			_canvas.lock();
 			_canvas.fillRect( _canvas.rect, _backgroundColor );
 			_containerPosition.x = _containerPosition.y = 0;

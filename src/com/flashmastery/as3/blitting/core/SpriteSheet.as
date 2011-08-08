@@ -6,7 +6,9 @@ package com.flashmastery.as3.blitting.core {
 	import flash.geom.Rectangle;
 	
 	[Event(name="added", type="flash.events.Event")]
+	[Event(name="removed", type="flash.events.Event")]
 	[Event(name="addedToStage", type="flash.events.Event")]
+	[Event(name="removedFromStage", type="flash.events.Event")]
 	[Event(name="sMouseWheel", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
 	[Event(name="sMouseMove", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
 	[Event(name="sMouseOver", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]

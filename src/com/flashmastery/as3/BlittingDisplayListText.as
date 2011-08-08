@@ -33,14 +33,11 @@ package com.flashmastery.as3 {
 			_view.initWithDimensions( stage.stageWidth, stage.stageHeight );
 			_view.smoothing = true;
 			_stage = new SpriteSheetStage();
-//			trace( _stage.name );
 			_view.spriteSheetStage = _stage;
 			var container : SpriteSheetContainer = new SpriteSheetContainer();
 			_stage.addChild( container );
-//			trace( container.name );
 			var rect:SpriteSheet = new SpriteSheet();
 			var bitmapData : BitmapData = new BitmapData( 50, 50, true, 0x00000000 );
-//			bitmapData.fillRect( new Rectangle( 0, 0, 50, 50 ), 0xFFFF0000 );
 			bitmapData.fillRect( new Rectangle( 10, 10, 30, 30 ), 0xFFFF0000 );
 			container.x = 150;
 			container.y = 150;
@@ -52,21 +49,10 @@ package com.flashmastery.as3 {
 				rect.bitmapData = bitmapData;
 				rect.x = i * 25;
 				rect.y = i * 25;
-//				rect.registrationOffsetX = -25;
-//				rect.registrationOffsetY = -25;
-//				rect.useHandCursor = true;
 				container.addChild( rect );
-//				trace( rect.name );
-//				trace( rect.localToGlobal( new Point( -10, -10 ) ) );
-//				trace( rect.globalToLocal( new Point( i * 70 - 10, i * 70 - 10 ) ) );
 				trace( rect.globalToLocal( new Point( 98, 98 ) ) );
 				trace( rect.localToGlobal( new Point( 0, 0 ) ) );
-//				trace( rect.getRectByCoords( _stage ) );
 			}
-//			container.addEventListener( SpriteSheetEvent.MOUSE_OVER, mouseOverHandler );
-//			container.addEventListener( SpriteSheetEvent.MOUSE_OUT, mouseOutHandler );
-//			trace( SpriteSheetEvent.MOUSE_OVER, container.name, container.hasEventListener( SpriteSheetEvent.MOUSE_OVER ) );
-//			trace( SpriteSheetEvent.MOUSE_OUT, container.name, container.hasEventListener( SpriteSheetEvent.MOUSE_OUT ) );
 			_stage.addEventListener( SpriteSheetEvent.MOUSE_OVER, mouseHandler );
 			_stage.addEventListener( SpriteSheetEvent.MOUSE_OUT, mouseHandler );
 			_stage.addEventListener( SpriteSheetEvent.MOUSE_DOWN, mouseHandler );

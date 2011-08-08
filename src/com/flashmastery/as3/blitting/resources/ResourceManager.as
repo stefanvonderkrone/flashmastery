@@ -170,6 +170,10 @@ package com.flashmastery.as3.blitting.resources {
 			return null;
 		}
 		
+		public static function hasResourceByKey( key : String ) : Boolean {
+			return _keyList.indexOf( key ) > -1;
+		}
+		
 		public static function clear() : void {
 			_keyList.length = 0;
 			_keyList = null;
