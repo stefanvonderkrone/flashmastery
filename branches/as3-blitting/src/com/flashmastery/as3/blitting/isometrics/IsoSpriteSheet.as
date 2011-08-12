@@ -101,7 +101,7 @@ package com.flashmastery.as3.blitting.isometrics {
 		}
 
 		protected function updateIsoCoords() : void {
-			_isoX = _x / _cellSizeX + _x / _cellSizeY;
+			_isoX = _x / _cellSizeX + _y / _cellSizeY;
 			_isoY = ( _y + _isoZ * _cellSizeZ ) / _cellSizeY - _x / _cellSizeX;
 			if ( _autoEvenIsoCoords ) {
 				_isoX = Math.round( _isoX );
