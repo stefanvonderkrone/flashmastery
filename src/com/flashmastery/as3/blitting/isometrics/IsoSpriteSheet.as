@@ -103,11 +103,7 @@ package com.flashmastery.as3.blitting.isometrics {
 		protected function updateIsoCoords() : void {
 			_isoX = _x / _cellSizeX + _y / _cellSizeY;
 			_isoY = ( _y + _isoZ * _cellSizeZ ) / _cellSizeY - _x / _cellSizeX;
-			if ( _autoEvenIsoCoords ) {
-				_isoX = Math.round( _isoX );
-				_isoY = Math.round( _isoY );
-				updateCoords();
-			} else _flattenedPosY = _y + _isoZ * _cellSizeZ;
+			_flattenedPosY = _y + _isoZ * _cellSizeZ;
 		}
 
 		public function get flattenedPosY() : Number {
@@ -120,6 +116,12 @@ package com.flashmastery.as3.blitting.isometrics {
 
 		public function set autoEvenIsoCoords( autoEvenIsoCoords : Boolean ) : void {
 			_autoEvenIsoCoords = autoEvenIsoCoords;
+		}
+		
+		public function evenIsoCoords() : void {
+			_isoX = Math.round( _isoX );
+			_isoY = Math.round( _isoY );
+			updateCoords();
 		}
 	}
 }
