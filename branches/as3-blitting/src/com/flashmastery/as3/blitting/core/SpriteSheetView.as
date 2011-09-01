@@ -262,5 +262,9 @@ package com.flashmastery.as3.blitting.core {
 		override public function set mouseEnabled( enabled : Boolean ) : void {
 			super.mouseEnabled = enabled;
 		}
+
+		public function get canvas() : BitmapData {
+			return _canvas;
+		}
 	}
 }
