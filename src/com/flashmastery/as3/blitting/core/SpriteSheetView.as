@@ -145,8 +145,8 @@ package com.flashmastery.as3.blitting.core {
 			var sprite : SpriteSheet;
 			var children : Vector.<SpriteSheet>;
 			var childrenLength : int;
-			if ( container.getRectByCoords( _spriteSheetStage ).containsPoint( point ) ) {
-				if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).numChildren > 0 ) {
+			if ( container.mouseEnabled && container.getRectByCoords( _spriteSheetStage ).containsPoint( point ) ) {
+				if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).numChildren > 0 && SpriteSheetContainer( container ).mouseChildren ) {
 					children = SpriteSheetContainer( container ).children;
 					childrenLength = children.length;
 					for ( var i : int = childrenLength - 1; i >= 0; i-- ) {
