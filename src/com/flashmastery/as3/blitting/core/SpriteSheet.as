@@ -151,6 +151,7 @@ package com.flashmastery.as3.blitting.core {
 				point = point.clone();
 				point.x -= _registrationOffsetX;
 				point.y -= _registrationOffsetY;
+//				trace( _name, "hitsPointOfBitmap", point, _bitmapData.hitTest( _hitTestZeroPoint, 0, point ) );
 				return _bitmapData.hitTest( _hitTestZeroPoint, 0, point );
 			}
 //			_bitmapDataHitTestRect = new Rectangle( _registrationOffsetX, _registrationOffsetY, _rect.width, _rect.height );//getRectByCoords( this );

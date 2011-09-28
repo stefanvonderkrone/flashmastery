@@ -96,11 +96,15 @@ package com.flashmastery.as3.blitting.core {
 		public function hitsPoint( point : Point ) : Boolean {
 			var length : int = _children.length;
 			var child : SpriteSheet;
+			var localPoint : Point;
 			for ( var i : int = 0; i < length; i++ ) {
 				child = _children[ int( i ) ];
-				if ( child is SpriteSheetContainer && SpriteSheetContainer( child ).hitsPoint( point ) )
+				localPoint = point.clone();
+				localPoint.x -= child.x;// + child.registrationOffsetX;
+				localPoint.y -= child.y;// + child.registrationOffsetY;
+				if ( child is SpriteSheetContainer && SpriteSheetContainer( child ).hitsPoint( localPoint ) )
 					return true;
-				else if ( child.hitsPointOfBitmap( point ) )
+				else if ( child.hitsPointOfBitmap( localPoint ) )
 					return true;
 			}
 			return hitsPointOfBitmap( point );

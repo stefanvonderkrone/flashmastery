@@ -154,6 +154,8 @@ package com.flashmastery.as3.blitting.core {
 						sprite = getCurrentSpriteSheetUnderPoint( sprite, point );
 						if ( sprite && sprite.hitsPointOfBitmap( sprite.globalToLocal( point ) ) )
 							return sprite;
+						else if ( sprite is SpriteSheetContainer && !SpriteSheetContainer( sprite ).mouseChildren && SpriteSheetContainer( container ).hitsPoint( container.globalToLocal( point ) ) )
+							return sprite;
 					}
 				} else if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).hitsPoint( container.globalToLocal( point ) ) )
 					return container;
