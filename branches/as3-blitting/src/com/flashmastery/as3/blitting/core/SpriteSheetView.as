@@ -185,7 +185,7 @@ package com.flashmastery.as3.blitting.core {
 			if ( spriteSheet.bitmapData ) {
 				_renderRect.width = spriteSheet.bitmapData.width;
 				_renderRect.height = spriteSheet.bitmapData.height;
-				canvas.copyPixels( spriteSheet.bitmapData, _renderRect, _renderPoint );
+				canvas.copyPixels( spriteSheet.bitmapData, _renderRect, _renderPoint, null, null, _canvas.transparent );
 			}
 			if ( spriteSheet is SpriteSheetContainer ) {
 				var children : Vector.<SpriteSheet> = SpriteSheetContainer( spriteSheet ).children;
