@@ -71,9 +71,13 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		protected function mouseMoveHandler( evt : MouseEvent = null ) : void {
+//			trace("SpriteSheetView.mouseMoveHandler(evt)");
 			_mousePosition.x = int( mouseX );
 			_mousePosition.y = int( mouseY );
+//			var startTime : int = getTimer();
 			var currentTarget : SpriteSheet = getCurrentSpriteSheetUnderPoint( _spriteSheetStage, _mousePosition );
+//			var endTime : int = getTimer();
+//			trace("SpriteSheetView.mouseMoveHandler(evt)", endTime - startTime);
 			if ( _currentMouseTarget != currentTarget ) {
 				// MouseOver / MouseOut
 				if ( _currentMouseTarget )
@@ -149,8 +153,8 @@ package com.flashmastery.as3.blitting.core {
 				if ( container is SpriteSheetContainer && SpriteSheetContainer( container ).numChildren > 0 && SpriteSheetContainer( container ).mouseChildren ) {
 					children = SpriteSheetContainer( container ).children;
 					childrenLength = children.length;
-					for ( var i : int = childrenLength - 1; i >= 0; i-- ) {
-						sprite = children[ int( i ) ];
+					while( --childrenLength > -1 ) {
+						sprite = children[ int( childrenLength ) ];
 						sprite = getCurrentSpriteSheetUnderPoint( sprite, point );
 						if ( sprite && sprite.hitsPointOfBitmap( sprite.globalToLocal( point ) ) )
 							return sprite;
