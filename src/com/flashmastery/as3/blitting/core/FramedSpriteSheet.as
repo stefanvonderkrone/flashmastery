@@ -76,7 +76,36 @@ package com.flashmastery.as3.blitting.core {
 		public function addPhase( name : String, indicesAsArrayOrVector : Object ) : void {
 			_phases[ name ] = Vector.<int>( indicesAsArrayOrVector );
 		}
-
+		
+		public function removePhase( name : String ) : void {
+			if ( _phases[ name ] )
+				delete _phases[ name ];
+		}
+		
+		public function clearPhases() : void {
+			_phases = new Dictionary();
+			_currentFrame = 0;
+			_updateFrame = 0;
+			_defaultPhase = "";
+			_currentPhase = null;
+			_currentPhaseName = "";
+		}
+		
+		public function clear() : void {
+			_updateIntervalFrames = 1;
+			_isPlaying = true;
+			_autoUpdate = true;
+			_spriteSheet.bitmapData = null;
+			_spriteSheet.x = 0;
+			_spriteSheet.y = 0;
+			_spriteSheetList = null;
+			_trimmedList = null;
+			_sourceSizeList = null;
+			_sourceRectList = null;
+			_resourceKey = null;
+			clearPhases();
+		}
+		
 		public function usePhase( phaseName : String ) : void {
 			_currentPhaseName = phaseName;
 			_currentPhase = _phases[ _currentPhaseName ];
