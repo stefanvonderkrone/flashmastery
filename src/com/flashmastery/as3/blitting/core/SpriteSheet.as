@@ -26,23 +26,31 @@ package com.flashmastery.as3.blitting.core {
 		protected static const shapeColorMultiplier : uint = 16;
 		protected static const _hitTestZeroPoint : Point = new Point();
 		
+		// spriteSheet
 		protected var _bitmapData : BitmapData;
+		protected var _updated : Boolean = true;
 		protected var _name : String;
-		protected var _parent : SpriteSheetContainer;
-		protected var _root : SpriteSheet;
-		protected var _stage : SpriteSheetStage;
 		protected var _visible : Boolean = true;
+		
+		// bounds & position
 		protected var _x : int = 0;
 		protected var _y : int = 0;
 		protected var _registrationOffsetX : int = 0;
 		protected var _registrationOffsetY : int = 0;
+		protected var _rect : Rectangle;
+		protected var _bitmapDataHitTestRect : Rectangle;
+		
+		// display-list
+		protected var _parent : SpriteSheetContainer;
+		protected var _root : SpriteSheet;
+		protected var _stage : SpriteSheetStage;
+		
+		// mouse detection
 		protected var _mouseEnabled : Boolean = true;
 		protected var _bMouseEnabled : Boolean = true;
 		protected var _useHandCursor : Boolean = false;
 		protected var _bUseHandCursor : Boolean = false;
-		protected var _shapeColor : uint;
-		protected var _rect : Rectangle;
-		protected var _bitmapDataHitTestRect : Rectangle;
+		
 
 		public function SpriteSheet() {
 			super();
@@ -51,7 +59,6 @@ package com.flashmastery.as3.blitting.core {
 
 		protected function construct() : void {
 			_name = "spriteSheet" + spriteIndex.toString();
-			_shapeColor = shapeColorMultiplier * ( spriteIndex + 1 );
 			_rect = new Rectangle();
 			_bitmapDataHitTestRect = new Rectangle();
 			_root = this;
@@ -94,9 +101,8 @@ package com.flashmastery.as3.blitting.core {
 			var localPoint : Point = point.clone();
 			localPoint.x += _registrationOffsetX;
 			localPoint.y += _registrationOffsetY;
-			var i : int;
 			var children : Vector.<SpriteSheet>;
-			var childrenLength : int;
+			var childIndex : int;
 			var child : SpriteSheet;
 			for ( ; sprite != null; ) {
 //				trace(_name + ".globalToLocal(point)", point, localPoint, sprite.name);
@@ -107,9 +113,9 @@ package com.flashmastery.as3.blitting.core {
 				}
 				if ( sprite is SpriteSheetContainer ) {
 					children = SpriteSheetContainer( sprite ).children;
-					childrenLength = children.length;
-					for ( i = 0; i < childrenLength; i++ ) {
-						child = children[ int( i ) ];
+					childIndex = children.length;
+					while ( --childIndex > -1 ){
+						child = children[ int( childIndex ) ];
 						if ( ( child is SpriteSheetContainer && SpriteSheetContainer( child ).contains( this ) ) || child == this ) {
 							sprite = child;
 							continue;
@@ -140,10 +146,15 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set bitmapData( bitmapData : BitmapData ) : void {
-			if ( _bitmapData == bitmapData ) return;
-			_bitmapData = bitmapData;
-			_rect.width = _bitmapDataHitTestRect.width = _bitmapData ? _bitmapData.width : 0;
-			_rect.height = _bitmapDataHitTestRect.height = _bitmapData ? _bitmapData.height : 0;
+			if ( _bitmapData != bitmapData ) {
+	//			trace("SpriteSheet.bitmapData(bitmapData)");
+				_bitmapData = bitmapData;
+				_rect.width = _bitmapDataHitTestRect.width = _bitmapData ? _bitmapData.width : 0;
+				_rect.height = _bitmapDataHitTestRect.height = _bitmapData ? _bitmapData.height : 0;
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
+			}
 		}
 		
 		public function hitsPointOfBitmap( point : Point ) : Boolean {
@@ -172,10 +183,15 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function bSetParent( parent : SpriteSheetContainer ) : void {
+			trace(this + ".bSetParent(parent)");
 			if ( parent != _parent ) {
 				_parent = parent;
-				if ( _parent ) dispatchEvent( new Event( Event.ADDED ) );
-				else dispatchEvent( new Event( Event.REMOVED ) );
+				if ( _parent ) {
+					dispatchEvent( new Event( Event.ADDED ) );
+					_updated = true;
+					if ( _parent && !_parent.updated )
+						_parent.bSetUpdated();
+				} else dispatchEvent( new Event( Event.REMOVED ) );
 			}
 		}
 
@@ -204,7 +220,12 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set visible( visible : Boolean ) : void {
-			_visible = visible;
+			if ( visible != _visible ) {
+				_visible = visible;
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
+			}
 		}
 
 		public function get x() : int {
@@ -212,8 +233,13 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set x( x : int ) : void {
-			_x = x;
-			_rect.x = _x + _registrationOffsetX;
+			if ( x != _x ) {
+				_x = x;
+				_rect.x = _x + _registrationOffsetX;
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
+			}
 		}
 
 		public function get y() : int {
@@ -221,8 +247,13 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set y( y : int ) : void {
-			_y = y;
-			_rect.y = _y + _registrationOffsetY;
+			if ( y != _y ) {
+				_y = y;
+				_rect.y = _y + _registrationOffsetY;
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
+			}
 		}
 
 		public function get registrationOffsetX() : int {
@@ -230,9 +261,14 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set registrationOffsetX( registrationOffsetX : int ) : void {
-			_registrationOffsetX = registrationOffsetX;
-			_rect.x = _x + _registrationOffsetX;
-			_bitmapDataHitTestRect.x = _registrationOffsetX;
+			if ( registrationOffsetX != _registrationOffsetX ) {
+				_registrationOffsetX = registrationOffsetX;
+				_rect.x = _x + _registrationOffsetX;
+				_bitmapDataHitTestRect.x = _registrationOffsetX;
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
+			}
 		}
 
 		public function get registrationOffsetY() : int {
@@ -240,9 +276,14 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function set registrationOffsetY( registrationOffsetY : int ) : void {
-			_registrationOffsetY = registrationOffsetY;
-			_rect.y = _y + _registrationOffsetY;
-			_bitmapDataHitTestRect.y = _registrationOffsetY;
+			if ( registrationOffsetY != _registrationOffsetY ) {
+				_registrationOffsetY = registrationOffsetY;
+				_rect.y = _y + _registrationOffsetY;
+				_bitmapDataHitTestRect.y = _registrationOffsetY;
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
+			}
 		}
 
 		public function get mouseEnabled() : Boolean {
@@ -270,6 +311,14 @@ package com.flashmastery.as3.blitting.core {
 		}
 		
 		public function updateForRender() : void {
+		}
+		
+		public function updateAfterRender() : void {
+			_updated = false;
+		}
+
+		public function get updated() : Boolean {
+			return _updated;
 		}
 	}
 }

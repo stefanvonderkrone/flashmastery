@@ -1,4 +1,5 @@
 package com.flashmastery.as3.blitting.isometrics {
+	import flash.utils.getTimer;
 	import com.flashmastery.as3.blitting.core.SpriteSheet;
 
 	/**
@@ -32,10 +33,10 @@ package com.flashmastery.as3.blitting.isometrics {
 		
 		override public function set cellSizeX( cellSizeX : uint ) : void {
 			super.cellSizeX = cellSizeX;
-			var length : int = _children.length;
+			var index : int = _children.length;
 			var child : SpriteSheet;
-			for ( var i : int = 0; i < length; i++ ) {
-				child = _children[ int( i ) ];
+			while ( --index > -1 ) {
+				child = _children[ int( index ) ];
 				if ( child is IsoSpriteSheet )
 					IsoSpriteSheet( child ).cellSizeX = _cellSizeX;
 			}
@@ -43,10 +44,10 @@ package com.flashmastery.as3.blitting.isometrics {
 		
 		override public function set cellSizeY( cellSizeY : uint ) : void {
 			super.cellSizeY = cellSizeY;
-			var length : int = _children.length;
+			var index : int = _children.length;
 			var child : SpriteSheet;
-			for ( var i : int = 0; i < length; i++ ) {
-				child = _children[ int( i ) ];
+			while ( --index > -1 ) {
+				child = _children[ int( index ) ];
 				if ( child is IsoSpriteSheet )
 					IsoSpriteSheet( child ).cellSizeY = _cellSizeY;
 			}
@@ -54,16 +55,17 @@ package com.flashmastery.as3.blitting.isometrics {
 		
 		override public function set cellSizeZ( cellSizeZ : uint ) : void {
 			super.cellSizeZ = cellSizeZ;
-			var length : int = _children.length;
+			var index : int = _children.length;
 			var child : SpriteSheet;
-			for ( var i : int = 0; i < length; i++ ) {
-				child = _children[ int( i ) ];
+			while ( --index > -1 ) {
+				child = _children[ int( index ) ];
 				if ( child is IsoSpriteSheet )
 					IsoSpriteSheet( child ).cellSizeZ = _cellSizeZ;
 			}
 		}
 		
 		override public function updateForRender() : void {
+			super.updateForRender();
 			if ( _children.length > 0 )
 				sortChildren( _children );
 		}
@@ -71,19 +73,19 @@ package com.flashmastery.as3.blitting.isometrics {
 		protected function sortChildren( children : Vector.<SpriteSheet> ) : void {
 			var sortList : Array = [];
 			var unsortedList : Array = [];
-			var i : int;
-			var length : uint = children.length;
+			var index : uint = _children.length;
 			var child : SpriteSheet;
-			for ( i = 0; i < length; i++ ) {
-				child = children[int( i )];
+			while ( --index > -1 ) {
+				child = children[int( index )];
 				if ( child is IsoSpriteSheet )
 					sortList.push( child );
 				else unsortedList.push( child );
 			}
 			sortList.sortOn( "flattenedPosY", Array.NUMERIC );
 			sortList = unsortedList.concat( sortList );
-			for ( i = 0; i < length; i++ )
-				_children[ int( i ) ] = sortList[ int( i ) ];
+			index = _children.length;
+			while ( --index > -1 )
+				_children[ int( index ) ] = sortList[ int( index ) ];
 		}
 	}
 }
