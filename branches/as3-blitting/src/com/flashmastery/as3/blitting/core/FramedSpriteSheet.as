@@ -1,4 +1,5 @@
 package com.flashmastery.as3.blitting.core {
+	import flash.utils.getTimer;
 	import com.flashmastery.as3.blitting.resources.ResourceManager;
 
 	import flash.display.BitmapData;
@@ -44,10 +45,13 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		protected function updateSpriteSheet() : void {
+			if ( _spriteSheetList == null ) return;
+//			trace("FramedSpriteSheet.updateSpriteSheet()",_spriteSheet.bitmapData == _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ]);
 			_spriteSheet.bitmapData = _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ];
 			const rect : Rectangle = _sourceRectList[ _currentPhase[ _currentFrame - 1 ] ];
 			_spriteSheet.x = rect.x;
 			_spriteSheet.y = rect.y;
+//			trace("FramedSpriteSheet.updateSpriteSheet()", _updated, _parent);
 		}
 		
 		public function useResouceByKey( key : String ) : void {
@@ -56,15 +60,20 @@ package com.flashmastery.as3.blitting.core {
 				_trimmedList = ResourceManager.getTrimmedByKey( key );
 				_sourceSizeList = ResourceManager.getSourceSizesByKey( key );
 				_sourceRectList = ResourceManager.getSourceRectsByKey( key );
+//				trace("FramedSpriteSheet.useResouceByKey(key)", key);
+//				trace("FramedSpriteSheet.useResouceByKey(key)", _spriteSheetList);
+//				trace("FramedSpriteSheet.useResouceByKey(key)", _trimmedList);
+//				trace("FramedSpriteSheet.useResouceByKey(key)", _sourceRectList);
+//				trace("FramedSpriteSheet.useResouceByKey(key)", _sourceSizeList);
 				if ( _spriteSheet ) {
 					_spriteSheet.bitmapData = null;
 					_spriteSheet.x = 0;
 					_spriteSheet.y = 0;
 				}
 				_currentPhase = new Vector.<int>( _spriteSheetList.length, true );
-				const length : int = _spriteSheetList.length;
-				for ( var i : int = 0; i < length; i++ )
-					_currentPhase[ int( i ) ] = i;
+				var index : int = _spriteSheetList.length;
+				while ( --index > -1 )
+					_currentPhase[ int( index ) ] = index;
 				_currentPhaseName = "";
 				_currentFrame = 1;
 				_phases[ "" ] = _currentPhase;
@@ -115,8 +124,9 @@ package com.flashmastery.as3.blitting.core {
 		}
 		
 		override public function updateForRender() : void {
+			super.updateForRender();
 			_updateFrame++;
-			if ( _autoUpdate && _isPlaying && _updateFrame >= _updateIntervalFrames ) {
+			if ( _currentPhase && _autoUpdate && _isPlaying && _updateFrame >= _updateIntervalFrames ) {
 				_currentFrame == _currentPhase.length ? _currentFrame = 1 : _currentFrame++;
 				_updateFrame = 0;
 				updateSpriteSheet();

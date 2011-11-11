@@ -30,6 +30,7 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function addChild( child : SpriteSheet ) : SpriteSheet {
+			trace(this + ".addChild(child)", child, isInvalidChild( child, this ), child == this);
 			if ( isInvalidChild( child, this ) || child == this ) return null;
 			if ( _children.indexOf( child ) > -1 )
 				_children.splice( _children.indexOf( child ), 1 );
@@ -41,6 +42,9 @@ package com.flashmastery.as3.blitting.core {
 			child.bUseHandCursor( _useHandCursor );
 			if ( root ) child.bSetRoot( root );
 			if ( stage ) child.bSetStage( stage );
+			_updated = true;
+			if ( _parent && !_parent.updated )
+				_parent.bSetUpdated();
 			return child;
 		}
 
@@ -59,16 +63,19 @@ package com.flashmastery.as3.blitting.core {
 			child.bUseHandCursor( _useHandCursor );
 			if ( root ) child.bSetRoot( root );
 			if ( stage ) child.bSetStage( stage );
+			_updated = true;
+			if ( _parent && !_parent.updated )
+				_parent.bSetUpdated();
 			return child;
 		}
 
 		public function contains( child : SpriteSheet ) : Boolean {
 			var valid : Boolean = _children.indexOf( child ) > -1 || child == this;
 			if ( !valid ) {
-				var length : int = _children.length;
+				var index : int = _children.length;
 				var sprite : SpriteSheet;
-				for ( var i : int = 0; i < length; i++ ) {
-					sprite = _children[ int( i ) ];
+				while ( --index > -1 ) {
+					sprite = _children[ int( index ) ];
 					if ( sprite is SpriteSheetContainer && SpriteSheetContainer( sprite ).contains( child ) )
 						return true;
 				}
@@ -81,10 +88,10 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function getChildByName( name : String ) : SpriteSheet {
-			var numSprites : int = _children.length;
-			for ( var i : int = 0; i < numSprites; i++ ) {
-				if ( _children[ int( i ) ].name == name )
-					return _children[ int( i ) ];
+			var index : int = _children.length;
+			while ( --index > -1 ) {
+				if ( _children[ int( index ) ].name == name )
+					return _children[ int( index ) ];
 			}
 			return null;
 		}
@@ -121,6 +128,9 @@ package com.flashmastery.as3.blitting.core {
 				child.bSetParent( null );
 				child.bSetRoot( child );
 				child.bSetStage( null );
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
 			}
 			return child;
 		}
@@ -132,6 +142,9 @@ package com.flashmastery.as3.blitting.core {
 				child.bSetParent( null );
 				child.bSetRoot( child );
 				child.bSetStage( null );
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
 			}
 			return child;
 		}
@@ -157,6 +170,9 @@ package com.flashmastery.as3.blitting.core {
 					setChildIndex( child2, index1 );
 					setChildIndex( child1, index2 );
 				}
+				_updated = true;
+				if ( _parent && !_parent.updated )
+					_parent.bSetUpdated();
 			}
 		}
 
@@ -168,9 +184,9 @@ package com.flashmastery.as3.blitting.core {
 			var rect : Rectangle = super.getRect();
 			var childRect : Rectangle;
 			var child : SpriteSheet;
-			var length : int = _children.length;
-			for ( var i : int = 0; i < length; i++ ) {
-				child = _children[ int( i ) ];
+			var index : int = _children.length;
+			while ( --index > -1 ) {
+				child = _children[ int( index ) ];
 				if ( childRect == null ) childRect = child.getRect();
 				childRect = childRect.union( child.getRect() );
 			}
@@ -189,13 +205,12 @@ package com.flashmastery.as3.blitting.core {
 				_innerCoordsRect.width = 0;
 				_innerCoordsRect.height = 0;
 //				trace(_name + ".getRectByCoords(targetCoordinateSpace)", rect);
-				var i : int;
 				if ( targetCoordinateSpace == this ) {
 					var child : SpriteSheet;
-					var childrenLength : int = _children.length;
+					var childIndex : int = _children.length;
 					var childRect : Rectangle;
-					for ( i = 0; i < childrenLength; i++ ) {
-						child = _children[ int( i ) ];
+					while ( --childIndex > -1 ) {
+						child = _children[ int( childIndex ) ];
 						childRect = child.getRectByCoords( this );
 						_innerCoordsRect = _innerCoordsRect.union( childRect );
 					}
@@ -223,18 +238,18 @@ package com.flashmastery.as3.blitting.core {
 		override public function bSetRoot( root : SpriteSheet ) : void {
 			if ( root != _root ) {
 				super.bSetRoot( root );
-				const length : int = _children.length;
-				for ( var i : int = 0; i < length; i++ )
-					_children[ int( i ) ].bSetRoot( root );
+				var index : int = _children.length;
+				while ( --index > -1 )
+					_children[ int( index ) ].bSetRoot( root );
 			}
 		}
 		
 		override public function bSetStage( stage : SpriteSheetStage ) : void {
 			if ( stage != _stage ) {
 				super.bSetStage( stage );
-				const length : int = _children.length;
-				for ( var i : int = 0; i < length; i++ )
-					_children[ int( i ) ].bSetStage( stage );
+				var index : int = _children.length;
+				while ( --index > -1 )
+					_children[ int( index ) ].bSetStage( stage );
 			}
 		}
 
@@ -244,23 +259,44 @@ package com.flashmastery.as3.blitting.core {
 
 		public function set mouseChildren( mouseChildren : Boolean ) : void {
 			_mouseChildren = mouseChildren;
-			var length : int = _children.length;
-			for ( var i : int = 0; i < length; i++ )
-				_children[ int( i ) ].bMouseEnabled( !( _mouseChildren || _mouseEnabled ) );
+			var index : int = _children.length;
+			while ( --index > -1 )
+				_children[ int( index ) ].bMouseEnabled( !( _mouseChildren || _mouseEnabled ) );
 		}
 		
 		override public function set mouseEnabled( mouseEnabled : Boolean ) : void {
 			_mouseEnabled = mouseEnabled;
-			var length : int = _children.length;
-			for ( var i : int = 0; i < length; i++ )
-				_children[ int( i ) ].bMouseEnabled( !( _mouseChildren || _mouseEnabled ) );
+			var index : int = _children.length;
+			while ( --index > -1 )
+				_children[ int( index ) ].bMouseEnabled( !( _mouseChildren || _mouseEnabled ) );
 		}
 		
 		override public function set useHandCursor( useHandCursor : Boolean ) : void {
 			_useHandCursor = useHandCursor;
-			var length : int = _children.length;
-			for ( var i : int = 0; i < length; i++ )
-				_children[ int( i ) ].bUseHandCursor( useHandCursor );
+			var index : int = _children.length;
+			while ( --index > -1 )
+				_children[ int( index ) ].bUseHandCursor( useHandCursor );
+		}
+		
+		public function bSetUpdated() : void {
+//			trace(this + ".bSetUpdated()");
+			_updated = true;
+			if ( _parent && !_parent.updated )
+				_parent.bSetUpdated();
+		}
+		
+		override public function updateForRender() : void {
+			super.updateForRender();
+			var index : int = _children.length;
+			while ( --index > -1 )
+				_children[ int( index ) ].updateForRender();
+		}
+		
+		override public function updateAfterRender() : void {
+			super.updateAfterRender();
+			var index : int = _children.length;
+			while ( --index > -1 )
+				_children[ int( index ) ].updateAfterRender();
 		}
 	}
 }
