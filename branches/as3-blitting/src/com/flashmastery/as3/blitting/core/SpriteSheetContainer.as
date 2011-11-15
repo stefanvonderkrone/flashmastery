@@ -30,7 +30,7 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function addChild( child : SpriteSheet ) : SpriteSheet {
-			trace(this + ".addChild(child)", child, isInvalidChild( child, this ), child == this);
+//			trace(this + ".addChild(child)", child, isInvalidChild( child, this ), child == this);
 			if ( isInvalidChild( child, this ) || child == this ) return null;
 			if ( _children.indexOf( child ) > -1 )
 				_children.splice( _children.indexOf( child ), 1 );
@@ -150,8 +150,10 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function setChildIndex( child : SpriteSheet, index : int ) : void {
-			if ( _children.indexOf( child ) > -1 && index < _children.length )
+			if ( _children.indexOf( child ) > -1 && index < _children.length ) {
 				addChildAt( child, index );
+				if ( _stage ) _stage.bUpdateChildOnStage( child );
+			}
 		}
 
 		public function swapChildren( child1 : SpriteSheet, child2 : SpriteSheet ) : void {
@@ -169,6 +171,10 @@ package com.flashmastery.as3.blitting.core {
 				} else {
 					setChildIndex( child2, index1 );
 					setChildIndex( child1, index2 );
+				}
+				if ( _stage ) {
+					_stage.bUpdateChildOnStage( child1 );
+					_stage.bUpdateChildOnStage( child2 );
 				}
 				_updated = true;
 				if ( _parent && !_parent.updated )
@@ -285,11 +291,11 @@ package com.flashmastery.as3.blitting.core {
 				_parent.bSetUpdated();
 		}
 		
-		override public function updateForRender() : void {
-			super.updateForRender();
+		override public function updateBeforRender() : void {
+			super.updateBeforRender();
 			var index : int = _children.length;
 			while ( --index > -1 )
-				_children[ int( index ) ].updateForRender();
+				_children[ int( index ) ].updateBeforRender();
 		}
 		
 		override public function updateAfterRender() : void {
