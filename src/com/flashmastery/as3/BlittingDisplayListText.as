@@ -38,9 +38,9 @@ package com.flashmastery.as3 {
 			_stage.addChild( container );
 			var rect:SpriteSheet = new SpriteSheet();
 			var bitmapData : BitmapData = new BitmapData( 50, 50, true, 0x00000000 );
-			bitmapData.fillRect( new Rectangle( 10, 10, 30, 30 ), 0xFFFF0000 );
-			container.x = 150;
-			container.y = 150;
+			bitmapData.fillRect( new Rectangle( 10, 10, 30, 30 ), 0xFF00FF00 );
+			container.x = 100;
+			container.y = 100;
 			container.registrationOffsetX = -50;
 			container.registrationOffsetY = -50;
 			container.useHandCursor = true;
@@ -49,6 +49,7 @@ package com.flashmastery.as3 {
 				rect.bitmapData = bitmapData;
 				rect.x = i * 25;
 				rect.y = i * 25;
+				rect.useHandCursor = true;
 				container.addChild( rect );
 				trace( rect.globalToLocal( new Point( 98, 98 ) ) );
 				trace( rect.localToGlobal( new Point( 0, 0 ) ) );
@@ -82,7 +83,7 @@ package com.flashmastery.as3 {
 		}
 
 		private function mouseHandler( evt : SpriteSheetEvent ) : void {
-			trace("BlittingDisplayListText.mouseHandler(evt)", evt.type, evt.target.name, evt.currentTarget.name);
+//			trace("BlittingDisplayListText.mouseHandler(evt)", evt.type, evt.target.name, evt.currentTarget.name);
 		}
 
 		private function enterframeHandler( evt : Event ) : void {

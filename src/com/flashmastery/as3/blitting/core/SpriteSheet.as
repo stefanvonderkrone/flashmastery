@@ -50,6 +50,8 @@ package com.flashmastery.as3.blitting.core {
 		protected var _bMouseEnabled : Boolean = true;
 		protected var _useHandCursor : Boolean = false;
 		protected var _bUseHandCursor : Boolean = false;
+		protected var _bStageIndex : int = -1;
+		protected var _bStageRect : Rectangle;
 		
 
 		public function SpriteSheet() {
@@ -63,6 +65,14 @@ package com.flashmastery.as3.blitting.core {
 			_bitmapDataHitTestRect = new Rectangle();
 			_root = this;
 			spriteIndex++;
+		}
+
+		protected function setUpdated() : void {
+			_updated = true;
+			if ( _parent && !_parent.updated )
+				_parent.bSetUpdated();
+			if ( _stage )
+				_stage.bUpdateChildOnStage( this );
 		}
 		
 		public function get width() : int {
@@ -151,9 +161,7 @@ package com.flashmastery.as3.blitting.core {
 				_bitmapData = bitmapData;
 				_rect.width = _bitmapDataHitTestRect.width = _bitmapData ? _bitmapData.width : 0;
 				_rect.height = _bitmapDataHitTestRect.height = _bitmapData ? _bitmapData.height : 0;
-				_updated = true;
-				if ( _parent && !_parent.updated )
-					_parent.bSetUpdated();
+				setUpdated();
 			}
 		}
 		
@@ -183,7 +191,7 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function bSetParent( parent : SpriteSheetContainer ) : void {
-			trace(this + ".bSetParent(parent)");
+//			trace(this + ".bSetParent(parent)");
 			if ( parent != _parent ) {
 				_parent = parent;
 				if ( _parent ) {
@@ -209,8 +217,12 @@ package com.flashmastery.as3.blitting.core {
 
 		public function bSetStage( stage : SpriteSheetStage ) : void {
 			if ( stage != _stage ) {
+				if ( _stage ) _stage.bRemoveChildFromStage( this );
 				_stage = stage;
-				if ( _stage ) dispatchEvent( new Event( Event.ADDED_TO_STAGE ) );
+				if ( _stage ) {
+					_stage.bAddChildToStage( this );
+					dispatchEvent( new Event( Event.ADDED_TO_STAGE ) );
+				}
 				else dispatchEvent( new Event( Event.REMOVED_FROM_STAGE ) );
 			}
 		}
@@ -310,7 +322,7 @@ package com.flashmastery.as3.blitting.core {
 			_bUseHandCursor = bUseHandCursor;
 		}
 		
-		public function updateForRender() : void {
+		public function updateBeforRender() : void {
 		}
 		
 		public function updateAfterRender() : void {
@@ -319,6 +331,22 @@ package com.flashmastery.as3.blitting.core {
 
 		public function get updated() : Boolean {
 			return _updated;
+		}
+
+		public function get bStageIndex() : int {
+			return _bStageIndex;
+		}
+
+		public function set bStageIndex( bStageIndex : int ) : void {
+			_bStageIndex = bStageIndex;
+		}
+
+		public function get bStageRect() : Rectangle {
+			return _bStageRect;
+		}
+
+		public function set bStageRect( bStageRect : Rectangle ) : void {
+			_bStageRect = bStageRect;
 		}
 	}
 }

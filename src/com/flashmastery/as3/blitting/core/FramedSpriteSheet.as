@@ -1,5 +1,4 @@
 package com.flashmastery.as3.blitting.core {
-	import flash.utils.getTimer;
 	import com.flashmastery.as3.blitting.resources.ResourceManager;
 
 	import flash.display.BitmapData;
@@ -36,6 +35,7 @@ package com.flashmastery.as3.blitting.core {
 			super.construct();
 			_phases = new Dictionary();
 			_spriteSheet = addChild( new SpriteSheet() );
+			_spriteSheet.mouseEnabled = false;
 			_currentFrame = 0;
 			_updateFrame = 0;
 			_updateIntervalFrames = 1;
@@ -47,10 +47,10 @@ package com.flashmastery.as3.blitting.core {
 		protected function updateSpriteSheet() : void {
 			if ( _spriteSheetList == null ) return;
 //			trace("FramedSpriteSheet.updateSpriteSheet()",_spriteSheet.bitmapData == _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ]);
-			_spriteSheet.bitmapData = _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ];
 			const rect : Rectangle = _sourceRectList[ _currentPhase[ _currentFrame - 1 ] ];
 			_spriteSheet.x = rect.x;
 			_spriteSheet.y = rect.y;
+			_spriteSheet.bitmapData = _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ];
 //			trace("FramedSpriteSheet.updateSpriteSheet()", _updated, _parent);
 		}
 		
@@ -123,8 +123,8 @@ package com.flashmastery.as3.blitting.core {
 			_currentFrame = 1;
 		}
 		
-		override public function updateForRender() : void {
-			super.updateForRender();
+		override public function updateBeforRender() : void {
+			super.updateBeforRender();
 			_updateFrame++;
 			if ( _currentPhase && _autoUpdate && _isPlaying && _updateFrame >= _updateIntervalFrames ) {
 				_currentFrame == _currentPhase.length ? _currentFrame = 1 : _currentFrame++;

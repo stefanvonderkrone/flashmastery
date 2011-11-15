@@ -1,5 +1,4 @@
 package com.flashmastery.as3.blitting.isometrics {
-	import flash.utils.getTimer;
 	import com.flashmastery.as3.blitting.core.SpriteSheet;
 
 	/**
@@ -64,8 +63,8 @@ package com.flashmastery.as3.blitting.isometrics {
 			}
 		}
 		
-		override public function updateForRender() : void {
-			super.updateForRender();
+		override public function updateBeforRender() : void {
+			super.updateBeforRender();
 			if ( _children.length > 0 )
 				sortChildren( _children );
 		}

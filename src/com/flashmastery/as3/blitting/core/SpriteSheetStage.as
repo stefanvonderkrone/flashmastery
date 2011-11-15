@@ -5,9 +5,10 @@ package com.flashmastery.as3.blitting.core {
 	 */
 	public class SpriteSheetStage extends SpriteSheetContainer {
 
-		
+		// stage
 		protected var _stageWidth : Number;
 		protected var _stageHeight : Number;
+		protected var _view : SpriteSheetView;
 
 		public function SpriteSheetStage() {
 			super();
@@ -75,6 +76,29 @@ package com.flashmastery.as3.blitting.core {
 
 		public final function bSetStageHeight( stageHeight : Number ) : void {
 			_stageHeight = stageHeight;
+		}
+		
+		public function bAddChildToStage( child : SpriteSheet ) : void {
+			if ( _view )
+				_view.bAddChildToStage( child );
+		}
+		
+		public function bRemoveChildFromStage( child : SpriteSheet ) : void {
+			if ( _view )
+				_view.bRemoveChildFromStage( child );
+		}
+		
+		public function bUpdateChildOnStage( child : SpriteSheet ) : void {
+			if ( _view )
+				_view.bUpdateChildOnStage( child );
+		}
+
+		public function get view() : SpriteSheetView {
+			return _view;
+		}
+
+		public function set view( view : SpriteSheetView ) : void {
+			_view = view;
 		}
 	}
 }
