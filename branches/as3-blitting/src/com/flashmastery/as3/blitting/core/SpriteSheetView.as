@@ -10,7 +10,6 @@ package com.flashmastery.as3.blitting.core {
 	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
 	import flash.ui.MouseCursor;
-	import flash.utils.getTimer;
 
 	[Event(name="sEnterframe", type="com.flashmastery.as3.blitting.events.SpriteSheetEvent")]
 
@@ -32,6 +31,7 @@ package com.flashmastery.as3.blitting.core {
 		protected var _height : Number;
 		protected var _currentMouseTarget : SpriteSheet;
 		protected var _mousePosition : Point;
+		protected var _oldMousePosition : Point;
 		protected var _mouseMoveEventReceived : Boolean;
 		protected var _hasRendered : Boolean;
 		
@@ -52,10 +52,15 @@ package com.flashmastery.as3.blitting.core {
 		private var _runs : Number = 0;
 
 		public function SpriteSheetView() {
+			init();
+		}
+
+		private function init() : void {
 			_renderPoint = new Point();
 			_containerPosition = new Point();
 			_renderRect = new Rectangle();
 			_mousePosition = new Point();
+			_oldMousePosition = new Point();
 		}
 
 		public function initWithDimensions( width : Number, height : Number, transparent : Boolean = false ) : void {
@@ -84,6 +89,9 @@ package com.flashmastery.as3.blitting.core {
 			removeEventListener( MouseEvent.MOUSE_UP, mouseUpHandler );
 			removeEventListener( MouseEvent.MOUSE_WHEEL, mouseWheelHandler );
 			removeEventListener( MouseEvent.CLICK, mouseClickHandler );
+			if ( _currentMouseTarget )
+				dispatchBubblingEvent( SpriteSheetEvent.MOUSE_OUT, _currentMouseTarget, _mousePosition, 0 );
+			_currentMouseTarget = null;
 		}
 
 		protected function rollOverHandler( evt : MouseEvent ) : void {
@@ -99,7 +107,11 @@ package com.flashmastery.as3.blitting.core {
 //			trace("SpriteSheetView.mouseMoveHandler(evt)");
 			_mousePosition.x = int( mouseX );
 			_mousePosition.y = int( mouseY );
-			_mouseMoveEventReceived = true;
+			if ( _oldMousePosition.x != _mousePosition.x || _oldMousePosition.y != _mousePosition.y ) {
+				_oldMousePosition.x = _mousePosition.x;
+				_oldMousePosition.y = _mousePosition.y;
+				_mouseMoveEventReceived = true;
+			}
 		}
 
 		protected function mouseClickHandler( evt : MouseEvent ) : void {
@@ -201,10 +213,10 @@ package com.flashmastery.as3.blitting.core {
 			const wSegmentIndex : int = Math.floor( stageCoords.x / _mouseSegmentWidth );
 			const hSegmentIndex : int = Math.floor( stageCoords.y / _mouseSegmentHeight );
 			var segmentIndex : int = hSegmentIndex * ( _mouseSegmentsX - 1 ) + wSegmentIndex;
-//			trace("SpriteSheetView.newGetCurrentSpriteSheetUnderPoint(stageCoords)", wSegmentIndex, hSegmentIndex, segmentIndex);
+//			trace("SpriteSheetView.getCurrentSpriteSheetUnderPoint(stageCoords)", wSegmentIndex, hSegmentIndex, segmentIndex);
 			const segmentList : Vector.<SpriteSheet> = _mouseGrid.length > segmentIndex ? _mouseGrid[ segmentIndex ] : null;
 			if ( segmentList && segmentList.length > 0 ) {
-//				trace("SpriteSheetView.newGetCurrentSpriteSheetUnderPoint(stageCoords)", segmentList.length);
+//				trace("SpriteSheetView.getCurrentSpriteSheetUnderPoint(stageCoords)", segmentList);
 				segmentIndex = segmentList.length;
 				var sprite : SpriteSheet;
 				const sortedRects : Array = [];
@@ -226,7 +238,6 @@ package com.flashmastery.as3.blitting.core {
 
 		private function getSpriteByRectAndStageCoords( sprite : SpriteSheet, stageCoords : Point ) : SpriteSheet {
 			var parentSprite : SpriteSheetContainer;
-//			trace("SpriteSheetView.getSpriteByRectAndStageCoords(sprite, stageCoords)", sprite.name);
 			if ( sprite.hitsPointOfBitmap( sprite.globalToLocal( stageCoords ) ) ) {
 //				trace("SpriteSheetView.getSpriteByRectAndStageCoords(sprite, stageCoords)", sprite.name, "hitsBitmap");
 				if ( sprite.mouseEnabled )
@@ -296,13 +307,13 @@ package com.flashmastery.as3.blitting.core {
 			_mouseSegments = _mouseSegmentsX * _mouseSegmentsY;
 			_mouseGrid = new Vector.<Vector.<SpriteSheet>>( _mouseSegments, true );
 			var numSegments : int = _mouseSegments;
-			var segmentX : int;
-			var segmentY : int;
-			_rectSprite.graphics.lineStyle( 1, 0x3333FF );
+//			var segmentX : int;
+//			var segmentY : int;
+//			_rectSprite.graphics.lineStyle( 1, 0x3333FF );
 			while ( --numSegments > -1 ) {
-				segmentX = numSegments % _mouseSegmentsX;
-				segmentY = ( numSegments - segmentX ) / _mouseSegmentsX;
-				_rectSprite.graphics.drawRect(_mouseSegmentWidth * segmentX, _mouseSegmentHeight * segmentY, _mouseSegmentWidth, _mouseSegmentHeight );
+//				segmentX = numSegments % _mouseSegmentsX;
+//				segmentY = ( numSegments - segmentX ) / _mouseSegmentsX;
+//				_rectSprite.graphics.drawRect(_mouseSegmentWidth * segmentX, _mouseSegmentHeight * segmentY, _mouseSegmentWidth, _mouseSegmentHeight );
 				_mouseGrid[ int( numSegments ) ] = new Vector.<SpriteSheet>();
 			}
 			updateRectangles();
@@ -351,9 +362,11 @@ package com.flashmastery.as3.blitting.core {
 					while ( --mRightIndex >= mLeftIndex ) {
 //						trace("SpriteSheetView.addChildToMouseGrid(child)", mRightIndex, mBottomIndex);
 						segmentIndex = mBottomIndex * ( _mouseSegmentsX - 1 ) + mRightIndex;
-						segmentList = _mouseGrid[ int( segmentIndex ) ];
-						if ( segmentList.indexOf( rect ) < 0 )
-							segmentList.push( child );
+						if ( segmentIndex < _mouseSegments ) {
+							segmentList = _mouseGrid[ int( segmentIndex ) ];
+							if ( segmentList.indexOf( rect ) < 0 )
+								segmentList.push( child );
+						}
 					}
 					mRightIndex = mRightConst;
 				}
@@ -381,7 +394,6 @@ package com.flashmastery.as3.blitting.core {
 		protected function addSprites( container : SpriteSheetContainer ) : void {
 			var indexOfChild : int = container.numChildren;
 			var child : SpriteSheet;
-			var rect : Rectangle;
 			var index : int;
 			while ( --indexOfChild > -1 ) {
 				child = container.getChildAt( indexOfChild );
@@ -414,7 +426,7 @@ package com.flashmastery.as3.blitting.core {
 					_allChildren.splice( index, 1 );
 				}
 				if ( child is SpriteSheetContainer )
-					addSprites( SpriteSheetContainer( child ) );
+					removeSprites( SpriteSheetContainer( child ) );
 			}
 		}
 		
@@ -436,9 +448,9 @@ package com.flashmastery.as3.blitting.core {
 				if ( _spriteSheetStage )
 					renderSpriteSheet( _canvas, _spriteSheetStage, _containerPosition );
 				_canvas.unlock();
+				_hasRendered = true;
 			}
 			_spriteSheetStage.updateAfterRender();
-			_hasRendered = true;
 		}
 
 		protected function renderSpriteSheet( canvas : BitmapData, spriteSheet : SpriteSheet, containerPosition : Point ) : void {
@@ -615,8 +627,12 @@ package com.flashmastery.as3.blitting.core {
 			// remove rect(s) from mouseGrid
 			// update rect(s)
 			// reset rect(s) tp mouseGrid
-			bRemoveChildFromStage( child );
-			bAddChildToStage( child );
+			const newStageRect : Rectangle = child.getRectByCoords( _spriteSheetStage );
+			const stageRect : Rectangle = child.bStageRect;
+			if ( stageRect == null || newStageRect.width != stageRect.width || newStageRect.height != stageRect.height || newStageRect.x != stageRect.x || newStageRect.y != stageRect.y ) {
+				bRemoveChildFromStage( child );
+				bAddChildToStage( child );
+			}
 		}
 	}
 }

@@ -70,6 +70,7 @@ package com.flashmastery.as3.blitting.core {
 		}
 
 		public function contains( child : SpriteSheet ) : Boolean {
+//			trace("SpriteSheetContainer.contains(child)", child.stageRelation, _stageRelation, this.name, this);
 			var valid : Boolean = _children.indexOf( child ) > -1 || child == this;
 			if ( !valid ) {
 				var index : int = _children.length;

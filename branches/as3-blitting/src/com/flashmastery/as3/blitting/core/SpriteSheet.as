@@ -44,6 +44,7 @@ package com.flashmastery.as3.blitting.core {
 		protected var _parent : SpriteSheetContainer;
 		protected var _root : SpriteSheet;
 		protected var _stage : SpriteSheetStage;
+		protected var _stageRelation : String;
 		
 		// mouse detection
 		protected var _mouseEnabled : Boolean = true;
@@ -71,8 +72,20 @@ package com.flashmastery.as3.blitting.core {
 			_updated = true;
 			if ( _parent && !_parent.updated )
 				_parent.bSetUpdated();
-			if ( _stage )
+			if ( _stage ) {
 				_stage.bUpdateChildOnStage( this );
+				_stageRelation = getStageRelation();
+			}
+		}
+
+		protected function getStageRelation() : String {
+			var relation : String = _name;
+			var parentSprite : SpriteSheet = _parent;
+			while ( parentSprite ) {
+				relation = parentSprite.name + "." + relation;
+				parentSprite = parentSprite.parent;
+			}
+			return relation;
 		}
 		
 		public function get width() : int {
@@ -114,26 +127,26 @@ package com.flashmastery.as3.blitting.core {
 			var children : Vector.<SpriteSheet>;
 			var childIndex : int;
 			var child : SpriteSheet;
-			for ( ; sprite != null; ) {
-//				trace(_name + ".globalToLocal(point)", point, localPoint, sprite.name);
-				localPoint.x -= sprite.x + sprite.registrationOffsetX;
-				localPoint.y -= sprite.y + sprite.registrationOffsetY;
-				if ( sprite == this ) {
-					return localPoint;
-				}
-				if ( sprite is SpriteSheetContainer ) {
-					children = SpriteSheetContainer( sprite ).children;
-					childIndex = children.length;
-					while ( --childIndex > -1 ){
-						child = children[ int( childIndex ) ];
-						if ( ( child is SpriteSheetContainer && SpriteSheetContainer( child ).contains( this ) ) || child == this ) {
-							sprite = child;
-							continue;
+			if ( sprite == this || ( sprite is SpriteSheetContainer && SpriteSheetContainer( sprite ).contains( this ) ) ) {
+				while ( sprite != null ) {
+					localPoint.x -= sprite.x + sprite.registrationOffsetX;
+					localPoint.y -= sprite.y + sprite.registrationOffsetY;
+					if ( sprite == this ) {
+						return localPoint;
+					}
+					if ( sprite is SpriteSheetContainer ) {
+						children = SpriteSheetContainer( sprite ).children;
+						childIndex = children.length;
+						while ( --childIndex > -1 ) {
+							child = children[ int( childIndex ) ];
+							if ( ( child is SpriteSheetContainer && SpriteSheetContainer( child ).contains( this ) ) || child == this ) {
+								sprite = child;
+								break;
+							}
 						}
 					}
 				}
 			}
-//			trace(_name + ".globalToLocal(point)", point, localPoint);
 			return localPoint;
 		}
 		
@@ -347,6 +360,10 @@ package com.flashmastery.as3.blitting.core {
 
 		public function set bStageRect( bStageRect : Rectangle ) : void {
 			_bStageRect = bStageRect;
+		}
+
+		public function get stageRelation() : String {
+			return _stageRelation;
 		}
 	}
 }
