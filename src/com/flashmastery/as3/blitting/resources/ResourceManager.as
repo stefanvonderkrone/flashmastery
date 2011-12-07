@@ -56,18 +56,18 @@ package com.flashmastery.as3.blitting.resources {
 
 		private static function getSourceSizes( json : Object ) : Vector.<Point> {
 			if ( json ) {
-				var index : int = json.frames ? json.frames.length : 0;
+				const length : int = json.frames ? json.frames.length : 0;
 				var jsonItem : Object;
 				var size : Point;
 				var sourceSizeList : Vector.<Point> = new Vector.<Point>();
-				sourceSizeList.length = index;
+				sourceSizeList.length = length;
 				sourceSizeList.fixed = true;
-				while ( --index > -1 ) {
-					jsonItem = json.frames[ int( index ) ];
+				for ( var i : int = 0; i < length; i++ ) {
+					jsonItem = json.frames[ int( i ) ];
 					size = new Point();
 					size.x = jsonItem.sourceSize.w;
 					size.y = jsonItem.sourceSize.h;
-					sourceSizeList[ int( index ) ] = size;
+					sourceSizeList[ int( i ) ] = size;
 				}
 				return sourceSizeList;
 			}
@@ -76,20 +76,20 @@ package com.flashmastery.as3.blitting.resources {
 
 		private static function getSourceRects( json : Object ) : Vector.<Rectangle> {
 			if ( json ) {
-				var index : int = json.frames ? json.frames.length : 0;
+				const length : int = json.frames ? json.frames.length : 0;
 				var jsonItem : Object;
 				var rect : Rectangle;
 				var sourceRectList : Vector.<Rectangle> = new Vector.<Rectangle>();
-				sourceRectList.length = index;
+				sourceRectList.length = length;
 				sourceRectList.fixed = true;
-				while ( --index > -1 ) {
-					jsonItem = json.frames[ int( index ) ];
+				for ( var i : int = 0; i < length; i++ ) {
+					jsonItem = json.frames[ int( i ) ];
 					rect = new Rectangle();
 					rect.x = jsonItem.spriteSourceSize.x;
 					rect.y = jsonItem.spriteSourceSize.y;
 					rect.width = jsonItem.spriteSourceSize.w;
 					rect.height = jsonItem.spriteSourceSize.h;
-					sourceRectList[ int( index ) ] = rect;
+					sourceRectList[ int( i ) ] = rect;
 				}
 				return sourceRectList;
 			}
@@ -98,14 +98,14 @@ package com.flashmastery.as3.blitting.resources {
 
 		private static function getTrimmed( json : Object ) : Vector.<Boolean> {
 			if ( json ) {
-				var index : int = json.frames ? json.frames.length : 0;
+				const length : int = json.frames ? json.frames.length : 0;
 				var jsonItem : Object;
 				var trimmedList : Vector.<Boolean> = new Vector.<Boolean>();
-				trimmedList.length = index;
+				trimmedList.length = length;
 				trimmedList.fixed = true;
-				while ( --index > -1 ) {
-					jsonItem = json.frames[ int( index ) ];
-					trimmedList[ int( index ) ] = jsonItem.trimmed;
+				for ( var i : int = 0; i < length; i++ ) {
+					jsonItem = json.frames[ int( i ) ];
+					trimmedList[ int( i ) ] = jsonItem.trimmed;
 				}
 				return trimmedList;
 			}
@@ -114,21 +114,21 @@ package com.flashmastery.as3.blitting.resources {
 
 		private static function getSpriteSheets( json : Object, spriteSheet : BitmapData ) : Vector.<BitmapData> {
 			if ( json && spriteSheet ) {
-				var index : int = json.frames ? json.frames.length : 0;
+				const length : int = json.frames ? json.frames.length : 0;
 				var bitmapData : BitmapData;
 				var jsonItem : Object;
 				var spriteSheets : Vector.<BitmapData> = new Vector.<BitmapData>();
-				spriteSheets.length = index;
+				spriteSheets.length = length;
 				spriteSheets.fixed = true;
-				while ( --index > -1 ) {
-					jsonItem = json.frames[ int( index ) ];
+				for ( var i : int = 0; i < length; i++ ) {
+					jsonItem = json.frames[ int( i ) ];
 					bitmapData = new BitmapData( jsonItem.frame.w, jsonItem.frame.h, spriteSheet.transparent, 0x00000000 );
 					_copyRect.x = jsonItem.frame.x;
 					_copyRect.y = jsonItem.frame.y;
 					_copyRect.width = jsonItem.frame.w;
 					_copyRect.height = jsonItem.frame.h;
 					bitmapData.copyPixels( spriteSheet, _copyRect, _copyPoint );
-					spriteSheets[ int( index ) ] = bitmapData;
+					spriteSheets[ int( i ) ] = bitmapData;
 				}
 				return spriteSheets;
 			}

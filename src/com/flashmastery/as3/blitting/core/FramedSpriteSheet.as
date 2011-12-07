@@ -46,12 +46,11 @@ package com.flashmastery.as3.blitting.core {
 
 		protected function updateSpriteSheet() : void {
 			if ( _spriteSheetList == null ) return;
-//			trace("FramedSpriteSheet.updateSpriteSheet()",_spriteSheet.bitmapData == _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ]);
 			const rect : Rectangle = _sourceRectList[ _currentPhase[ _currentFrame - 1 ] ];
 			_spriteSheet.x = rect.x;
 			_spriteSheet.y = rect.y;
 			_spriteSheet.bitmapData = _spriteSheetList[ _currentPhase[ _currentFrame - 1 ] ];
-//			trace("FramedSpriteSheet.updateSpriteSheet()", _updated, _parent);
+			setUpdated();
 		}
 		
 		public function useResouceByKey( key : String ) : void {
@@ -60,20 +59,17 @@ package com.flashmastery.as3.blitting.core {
 				_trimmedList = ResourceManager.getTrimmedByKey( key );
 				_sourceSizeList = ResourceManager.getSourceSizesByKey( key );
 				_sourceRectList = ResourceManager.getSourceRectsByKey( key );
-//				trace("FramedSpriteSheet.useResouceByKey(key)", key);
-//				trace("FramedSpriteSheet.useResouceByKey(key)", _spriteSheetList);
-//				trace("FramedSpriteSheet.useResouceByKey(key)", _trimmedList);
-//				trace("FramedSpriteSheet.useResouceByKey(key)", _sourceRectList);
-//				trace("FramedSpriteSheet.useResouceByKey(key)", _sourceSizeList);
 				if ( _spriteSheet ) {
 					_spriteSheet.bitmapData = null;
 					_spriteSheet.x = 0;
 					_spriteSheet.y = 0;
 				}
+				_resourceKey = key;
 				_currentPhase = new Vector.<int>( _spriteSheetList.length, true );
 				var index : int = _spriteSheetList.length;
 				while ( --index > -1 )
 					_currentPhase[ int( index ) ] = index;
+//				trace("FramedSpriteSheet.useResouceByKey(key)", key, _currentPhase);
 				_currentPhaseName = "";
 				_currentFrame = 1;
 				_phases[ "" ] = _currentPhase;
@@ -121,6 +117,7 @@ package com.flashmastery.as3.blitting.core {
 			if ( _currentPhase == null && _defaultPhase )
 				_currentPhase = _phases[ _defaultPhase ];
 			_currentFrame = 1;
+			updateSpriteSheet();
 		}
 		
 		override public function updateBeforRender() : void {
