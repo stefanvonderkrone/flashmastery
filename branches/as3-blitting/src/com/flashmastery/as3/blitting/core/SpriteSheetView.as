@@ -364,7 +364,7 @@ package com.flashmastery.as3.blitting.core {
 						segmentIndex = mBottomIndex * ( _mouseSegmentsX - 1 ) + mRightIndex;
 						if ( segmentIndex < _mouseSegments ) {
 							segmentList = _mouseGrid[ int( segmentIndex ) ];
-							if ( segmentList.indexOf( rect ) < 0 )
+							if ( segmentList.indexOf( child ) < 0 )
 								segmentList.push( child );
 						}
 					}
