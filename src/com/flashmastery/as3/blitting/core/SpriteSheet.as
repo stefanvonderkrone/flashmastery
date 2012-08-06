@@ -23,7 +23,6 @@ package com.flashmastery.as3.blitting.core {
 	public class SpriteSheet extends EventDispatcher {
 		
 		protected static var spriteIndex : int = 0;
-		protected static const shapeColorMultiplier : uint = 16;
 		protected static const _hitTestZeroPoint : Point = new Point();
 		
 		// spriteSheet
